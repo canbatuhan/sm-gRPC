@@ -29,19 +29,29 @@ public class InputQueueReceiver {
         Collection<Transition<SMStates, SMEvents>> transitionCollection = stateMachine.getTransitions();
         SMStates currentStateID = stateMachine.getState().getId();
 
+        // checking each transition
         for (Transition<SMStates, SMEvents> transition : transitionCollection) {
+
+            // check if the source of the is equal to current state
             SMStates sourceStateID = transition.getSource().getId();
             if (currentStateID == sourceStateID) {
+
+                // check if the triggering event of the transition is equal to event data received
                 SMEvents triggeringEvent = transition.getTrigger().getEvent();
                 if (eventData == triggeringEvent) {
                     return Boolean.TRUE;
                 }
+
             }
+
         }
 
         return Boolean.FALSE;
     }
 
+    /*
+        data format: %EVENT%
+    */
     @RabbitHandler
     public void receive(String messageReceived) throws InterruptedException {
         SMEvents eventData = SMEvents.valueOf(messageReceived);

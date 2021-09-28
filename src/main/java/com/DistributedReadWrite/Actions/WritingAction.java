@@ -9,10 +9,12 @@ public class WritingAction implements Action<SMStates, SMEvents> {
 
     @Override
     public void execute(StateContext<SMStates, SMEvents> stateContext) {
+    	// if it is proposer actually write, otherwise pretend to write
         Boolean isProposer = (Boolean) stateContext.getExtendedState().getVariables().get("Proposer");
         if (isProposer) System.out.println("actual writing...");
         else System.out.println("pseudo writing...");
 
+        // increment timestamp
         Integer timestamp = (Integer) stateContext.getExtendedState().getVariables().get("Timestamp");
         stateContext.getExtendedState().getVariables().put("Timestamp", timestamp+1);
         stateContext.getStateMachine().sendEvent(SMEvents.DONE);

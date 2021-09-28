@@ -13,6 +13,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+/*
+
+    PROBLEMATICS:
+
+    - FanoutExchange,
+    - Queues attached to the Fanouts,
+    - Bindings between queues and fanouts
+
+    Binding definitions are different
+    in tutorials -> Binding queryFanoutBinding(FanoutExchange fanout, Queue queue) {...}
+    in this file -> Binding queryFanoutBinding() {...}
+
+*/
 @Configuration
 public class MessageBrokerConfig {
 
@@ -21,6 +34,7 @@ public class MessageBrokerConfig {
         return new Queue("InputQueue");
     }
 
+    /* Input Machine Config */
     @Profile("input")
     private static class InputMachineConfig {
 
@@ -31,6 +45,7 @@ public class MessageBrokerConfig {
 
     }
 
+    /* Client Config */
     @Profile("client")
     private static class ClientMachineConfig {
 
@@ -52,6 +67,7 @@ public class MessageBrokerConfig {
             return new AnonymousQueue();
         }
 
+        
         @Bean
         public Binding queryFanoutBinding() {
             return BindingBuilder.bind(queryFanoutQueue()).to(queryFanout());

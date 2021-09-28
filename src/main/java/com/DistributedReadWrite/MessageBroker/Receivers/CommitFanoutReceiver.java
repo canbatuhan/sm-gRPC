@@ -16,6 +16,10 @@ public class CommitFanoutReceiver {
     @Autowired
     private StateMachine<SMStates, SMEvents> stateMachine;
 
+    /*
+        data format: %RESPONSE%-%TIMESTAMP%-%EVENT%
+    */
+    @RabbitHandler
     public void receive(String messageReceived) throws InterruptedException {
         try {
             // data parsing

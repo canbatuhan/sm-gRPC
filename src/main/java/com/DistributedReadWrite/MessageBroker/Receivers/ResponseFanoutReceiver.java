@@ -25,10 +25,13 @@ public class ResponseFanoutReceiver {
         return string.equals("commit");
     }
 
+    /*
+        data format: %RESPONSE%-%TIMESTAMP%-%EVENT%
+    */
     @RabbitHandler
     public void receive(String messageReceived) throws InterruptedException {
         try {
-            // data parsing
+            // data
             String commitOrAbort = messageReceived.split("-")[0];
             String timestamp = messageReceived.split("-")[1];
             String eventName = messageReceived.split("-")[2];

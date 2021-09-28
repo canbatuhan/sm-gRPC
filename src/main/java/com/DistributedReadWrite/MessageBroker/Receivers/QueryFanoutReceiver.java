@@ -28,26 +28,36 @@ public class QueryFanoutReceiver {
         Collection<Transition<SMStates, SMEvents>> transitionCollection = stateMachine.getTransitions();
         SMStates currentStateID = stateMachine.getState().getId();
 
+        // checking each transition
         for (Transition<SMStates, SMEvents> transition : transitionCollection) {
+
+            // check if the source of the is equal to current state
             SMStates sourceStateID = transition.getSource().getId();
             if (currentStateID == sourceStateID) {
+
+                // check if the triggering event of the transition is equal to event data received
                 SMEvents triggeringEvent = transition.getTrigger().getEvent();
                 if (eventData == triggeringEvent) {
                     return Boolean.TRUE;
                 }
+
             }
+
         }
 
         return Boolean.FALSE;
     }
 
+    /*
+        data format: %TIMESTAMP%-%EVENT%
+    */
     @RabbitHandler
     public void receive(String messageReceived) throws InterruptedException {
         try {
             // acceptors should be closed to other inputs for a while
             stateMachine.getExtendedState().getVariables().replace("ReadyForInput", false);
 
-            // data parsing(?)
+            // data
             Integer receivedTimestamp = Integer.valueOf(messageReceived.split("-")[0]);
             SMEvents eventData = SMEvents.valueOf(messageReceived.split("-")[1]);
 
