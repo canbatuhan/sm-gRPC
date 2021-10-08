@@ -2,6 +2,7 @@ package com.DistributedReadWrite.MessageBroker.Receivers;
 
 import com.DistributedReadWrite.StateMachine.SMEvents;
 import com.DistributedReadWrite.StateMachine.SMStates;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
