@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.transition.Transition;
 
 import java.util.Collection;
@@ -27,14 +28,16 @@ public class InputQueueReceiver {
 
     private Boolean isTriggering(SMEvents eventData) {
         Collection<Transition<SMStates, SMEvents>> transitionCollection = stateMachine.getTransitions();
-        SMStates currentStateID = stateMachine.getState().getId();
+        State<SMStates, SMEvents> currentState = stateMachine.getState();
+
+        if (currentState == null) return false;
 
         // checking each transition
         for (Transition<SMStates, SMEvents> transition : transitionCollection) {
 
             // check if the source of the is equal to current state
             SMStates sourceStateID = transition.getSource().getId();
-            if (currentStateID == sourceStateID) {
+            if (currentState.getId() == sourceStateID) {
 
                 // check if the triggering event of the transition is equal to event data received
                 SMEvents triggeringEvent = transition.getTrigger().getEvent();
@@ -66,7 +69,7 @@ public class InputQueueReceiver {
         if (eventData == SMEvents.WRITE) stateMachine.getExtendedState().getVariables().put("CanQuery", true);
 
         // wait until the machine get out of the action (commit-abort)
-        while (!readyForInput || !isTriggering(eventData)) {
+        while (readyForInput != null && !readyForInput || !isTriggering(eventData)) {
             Thread.sleep(500);
             System.out.println("waiting.......");
             readyForInput = (Boolean) stateMachine.getExtendedState().getVariables().get("ReadyForInput");

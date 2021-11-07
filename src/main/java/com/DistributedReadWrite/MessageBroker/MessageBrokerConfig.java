@@ -70,6 +70,7 @@ public class MessageBrokerConfig {
         
         @Bean
         public Binding queryFanoutBinding() {
+            System.out.println("QueryFanoutBind");
             return BindingBuilder.bind(queryFanoutQueue()).to(queryFanout());
         }
 
@@ -97,6 +98,7 @@ public class MessageBrokerConfig {
 
         @Bean
         public Binding responseFanoutBinding() {
+            System.out.println("ResponseFanoutBind");
             return BindingBuilder.bind(responseFanoutQueue()).to(responseFanout());
         }
 
@@ -124,7 +126,15 @@ public class MessageBrokerConfig {
 
         @Bean
         public Binding commitFanoutBinding() {
-            return BindingBuilder.bind(commitFanoutQueue()).to(commitFanout());
+            System.out.println("CommitFanoutBind");
+            try {
+                return BindingBuilder.bind(commitFanoutQueue()).to(commitFanout());
+            } catch (Exception e) {
+                System.out.println("CANT!");
+            }
+            finally {
+                return null;
+            }
         }
 
         @Bean
