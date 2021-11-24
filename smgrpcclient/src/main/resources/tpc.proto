@@ -1,0 +1,41 @@
+syntax = "proto3";
+option java_package = "com.cloudlab.grpc";
+
+service tpc {
+  rpc GreetingService(ConnectionRequest) returns (ConnectionResponse);
+  rpc AllocationService(AllocationRequest) returns (AllocationResponse);
+  rpc NotifyingService(NotificationMessage) returns (Empty);
+}
+
+/* GreetingService */
+message ConnectionRequest {
+  string clientID = 1;
+  int32 timestamp = 2;
+}
+
+message ConnectionResponse {
+  int32 timestamp = 1;
+  bool response = 2;
+}
+
+/* AllocationService */
+message AllocationRequest {
+  string clientID = 1;
+  int32 timestamp = 2;
+  string eventName = 3;
+}
+
+message AllocationResponse {
+  int32 timestamp = 1;
+  string eventName = 2;
+  bool response = 3;
+}
+
+/* NotifyingService */
+message NotificationMessage {
+  string clientID = 1;
+  int32 timestamp = 2;
+  string eventName = 3;
+}
+
+message Empty {}
