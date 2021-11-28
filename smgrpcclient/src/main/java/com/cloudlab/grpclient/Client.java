@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Client {
 
@@ -96,11 +97,32 @@ public class Client {
         this.updateTimestamp(this.timestamp);
     }
 
-    public void allocateAndExecute(Events event) {
+    /**
+     * Waits for a random time to send a allocation request again
+     * @param turn number of collisions (non-accepted allocation requests)
+     * @throws InterruptedException if thread fails to sleep
+     */
+    public void poll(int turn) throws InterruptedException {
+        double base = 0.0512;
+        double constant = ThreadLocalRandom
+                .current()
+                .nextDouble(0, Math.pow(2, turn) - 1);
+
+        double waitTime = base * constant;
+        Thread.sleep((long) waitTime);
+    }
+
+    /**
+     * Tries to allocate process time from server, then executes it
+     * @param event event that will trigger the state machine
+     */
+    public void allocateAndExecute(Events event) throws InterruptedException {
         boolean isAllocated = false;
+        int turn = 0;
 
         while (!isAllocated) {
-            // this.poll();
+            this.poll(turn);
+            turn = turn + 1;
             isAllocated = this.sendAllocationRequest(event);
         }
 
@@ -110,7 +132,6 @@ public class Client {
 
     /**
      * Runner for the client (preferably an infinite loop)
-     * @throws InterruptedException
      */
     public void run() throws InterruptedException {
         this.stateMachine.start();
