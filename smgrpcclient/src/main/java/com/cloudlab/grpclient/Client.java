@@ -63,6 +63,10 @@ public class Client {
                 .build();
     }
 
+    /**
+     * Sends a connection request to the server in order to introduce itself
+     * @return true if it is connected, else false
+     */
     public boolean sendConnectionRequest() {
         ConnectionRequest connectionRequest = this.generateConnectionRequest();
         ConnectionResponse connectionResponse = this.stub.greetingService(connectionRequest);
@@ -70,6 +74,11 @@ public class Client {
         return connectionResponse.getResponse();
     }
 
+    /**
+     * Sends a request to server in order to allocate a process time
+     * @param event event that triggers the state machine
+     * @return true if it is possible to allocate process time, else false
+     */
     public boolean sendAllocationRequest(Events event) {
         AllocationRequest allocationRequest = this.generateAllocationRequest(event);
         AllocationResponse allocationResponse = this.stub.allocationService(allocationRequest);
@@ -77,6 +86,10 @@ public class Client {
         return allocationResponse.getResponse();
     }
 
+    /**
+     * Sends a message to server telling that the process has finished
+     * @param event event that triggering the state machine
+     */
     public void sendNotificationMessage(Events event) {
         NotificationMessage notificationMessage = this.generateNotificationMessage(event);
         Empty empty = this.stub.notifyingService(notificationMessage);
@@ -95,6 +108,10 @@ public class Client {
         this.sendNotificationMessage(event);
     }
 
+    /**
+     * Runner for the client (preferably an infinite loop)
+     * @throws InterruptedException
+     */
     public void run() throws InterruptedException {
         this.stateMachine.start();
 

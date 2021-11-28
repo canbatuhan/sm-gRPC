@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 /**
  * TwoPhaseCommitServices
- * To be rewritten in a more generic way
+ * will be rewritten in a more generic way
  */
 public class TwoPhaseCommitServices extends tpcImplBase {
     private Integer timestamp;
@@ -34,18 +34,18 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         else this.timestamp = this.timestamp + 1;
     }
 
-    public ConnectionResponse generateConnectionResponse(Integer timestamp, boolean response) {
+    public ConnectionResponse generateConnectionResponse(boolean response) {
         return ConnectionResponse
                 .newBuilder()
-                .setTimestamp(timestamp)
+                .setTimestamp(this.timestamp)
                 .setResponse(response)
                 .build();
     }
 
-    public AllocationResponse generateAllocationResponse(Integer timestamp, String eventName, boolean response) {
+    public AllocationResponse generateAllocationResponse(String eventName, boolean response) {
         return AllocationResponse
                 .newBuilder()
-                .setTimestamp(timestamp)
+                .setTimestamp(this.timestamp)
                 .setEventName(eventName)
                 .setResponse(response)
                 .build();
@@ -60,7 +60,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
     /**
      * greetingService, used when a client first connects to a server
      * @param request, connection message includes clientID and timeStamp
-     * @param responseObserver, response message includes clientID and timeStamp
+     * @param responseObserver, sender of the response
      */
     @Override
     public void greetingService(ConnectionRequest request, StreamObserver<ConnectionResponse> responseObserver) {
@@ -84,7 +84,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
 
         /* generate and send the response */
         this.updateTimestamp(timestamp);
-        ConnectionResponse connectionResponse = this.generateConnectionResponse(timestamp, response);
+        ConnectionResponse connectionResponse = this.generateConnectionResponse(response);
         responseObserver.onNext(connectionResponse);
         responseObserver.onCompleted();
     }
@@ -92,7 +92,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
     /**
      * allocationService, used when a client wants to allocate a process time from the server
      * @param request, allocation message includes clientID, timeStamp and eventName
-     * @param responseObserver response message includes
+     * @param responseObserver sender of the response
      */
     @Override
     public void allocationService(AllocationRequest request, StreamObserver<AllocationResponse> responseObserver) {
@@ -127,7 +127,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
 
         /* generate and send the response */
         this.updateTimestamp(timestamp);
-        AllocationResponse allocationResponse = this.generateAllocationResponse(timestamp, eventName, response);
+        AllocationResponse allocationResponse = this.generateAllocationResponse(eventName, response);
         responseObserver.onNext(allocationResponse);
         responseObserver.onCompleted();
     }
@@ -135,7 +135,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
     /**
      * notifyingService, used when a client done with its process and release the allocation.
      * @param request, notifying message includes clientID, timeStamp and eventName
-     * @param responseObserver, an empty message
+     * @param responseObserver, sender of the response
      */
     @Override
     public void notifyingService(NotificationMessage request, StreamObserver<Empty> responseObserver) {
@@ -143,6 +143,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         Integer timestamp = request.getTimestamp();
         String eventName = request.getEventName();
 
+        /* temporary operations in notifying service */
         Events event = Events.valueOf(eventName);
         if (event == Events.WRITE) {
             this.stateMap.replace(States.S_writing, false);
