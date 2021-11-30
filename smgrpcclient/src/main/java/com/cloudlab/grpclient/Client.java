@@ -11,10 +11,8 @@ import com.cloudlab.utils.Events;
 import com.cloudlab.utils.States;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Client {
@@ -28,7 +26,7 @@ public class Client {
     public Client(StateMachine<States, Events> stateMachine) {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
-        this.clientID = new Random().toString();
+        this.clientID = ThreadLocalRandom.current().toString();
         this.timestamp = 0;
         this.stateMachine = stateMachine;
     }

@@ -1,0 +1,41 @@
+# States
+states:
+  initial:
+    name: "SI"
+    read: "A"
+    write:
+  S1:
+    name: "S1"
+    read: "A" "C"
+    write: "B"
+  S2:
+    name: "S2"
+    read: "C"
+    write: "A"
+  S3:
+    name: "S3"
+    read: "B"
+    write: "C"
+
+# Transitions & Events
+transitions:
+  TI:
+    event: "EI1"
+    from: "SI"
+    to: "S1"
+  T12:
+    event: "E12"
+    from: "S1"
+    to: "S2"
+  T21:
+    event: "E21"
+    from: "S2"
+    to: "S1"
+  T13:
+    event: "E13"
+    from: "S1"
+    to: "S3"
+  T32:
+    event: "E32"
+    from: "S3"
+    to: "S2"
