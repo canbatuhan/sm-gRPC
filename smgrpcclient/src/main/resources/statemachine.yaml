@@ -1,6 +1,6 @@
 # States
 states:
-  - initial:
+  - state:
       name: "SI"
       read: "A"
       write: null
