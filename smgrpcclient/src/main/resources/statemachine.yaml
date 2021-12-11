@@ -1,3 +1,7 @@
+# Configurations
+machineID: "grpcStateMachine"
+autoStartup: false
+
 # States
 states:
   - state:
