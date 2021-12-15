@@ -21,12 +21,22 @@ public class StateMachineGenerator {
         this.configPath = path;
     }
 
+    /**
+     * Reads .yaml file to get the configurations
+     * @return Configuration object, filled with the yaml input
+     * @throws IOException readValue can give an error
+     */
     private Configurations readYamlInput() throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
         return mapper.readValue(new File(this.configPath), Configurations.class);
     }
 
+    /**
+     * Builds a state machine according to the inputs by using StateMachineBuilder
+     * @return StateMachine<String, String>
+     * @throws Exception readYamlInput can give an error
+     */
     public StateMachine<String, String> buildMachine() throws Exception {
         Configurations configurations = this.readYamlInput();
         ArrayList<State> states = configurations.getStates();
