@@ -32,11 +32,19 @@ public class Client {
         this.stateMachine = new StateMachineGenerator("src/main/resources/statemachine.yaml").buildMachine();
     }
 
+    /**
+     * Updates the timestamp according to the incoming response
+     * @param timestamp timestamp of the server
+     */
     public void updateTimestamp(Integer timestamp) {
         if (this.timestamp < timestamp) this.timestamp = timestamp + 1;
         else this.timestamp = this.timestamp + 1;
     }
 
+    /**
+     * Generates a connection request by using clientID and timestamp
+     * @return ConnectionRequest
+     */
     public ConnectionRequest generateConnectionRequest() {
         return ConnectionRequest
                 .newBuilder()
@@ -45,6 +53,11 @@ public class Client {
                 .build();
     }
 
+    /**
+     * Generates an allocation request to send to server
+     * @param event event that the client wants to trigger
+     * @return AllocationRequest
+     */
     public AllocationRequest generateAllocationRequest(Events event) {
         return AllocationRequest
                 .newBuilder()
@@ -54,6 +67,11 @@ public class Client {
                 .build();
     }
 
+    /**
+     * Generates a notification message to say the job is done
+     * @param event event that has been triggered by the client
+     * @return NotificationMessage
+     */
     public NotificationMessage generateNotificationMessage(Events event) {
         return NotificationMessage
                 .newBuilder()
