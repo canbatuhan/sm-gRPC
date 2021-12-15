@@ -29,20 +29,4 @@ public class Configurations {
         return transitions;
     }
 
-    public State getInitialState() {
-        for (State state : this.states) {
-            if (state.getName().equals("SI")) {
-                return state;
-            }
-        }
-        return  null;
-    }
-
-    public ArrayList<String> getAllStateNames() {
-        ArrayList<String> stateNames = new ArrayList<>();
-        for (State state : this.states) {
-            stateNames.add(state.getName());
-        }
-        return stateNames;
-    }
 }
