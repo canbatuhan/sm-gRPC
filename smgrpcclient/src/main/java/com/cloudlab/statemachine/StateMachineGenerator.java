@@ -11,15 +11,20 @@ import org.springframework.statemachine.config.StateMachineBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 
 public class StateMachineGenerator {
 
+    private final String configPath;
+
+    public StateMachineGenerator(String path) {
+        this.configPath = path;
+    }
+
     private Configurations readYamlInput() throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
-        return mapper.readValue(new File("src/main/resources/statemachine.yaml"), Configurations.class);
+        return mapper.readValue(new File(this.configPath), Configurations.class);
     }
 
     public StateMachine<String, String> buildMachine() throws Exception {
@@ -34,10 +39,21 @@ public class StateMachineGenerator {
                 .machineId(configurations.getMachineID())
                 .autoStartup(configurations.isAutoStartup());
 
-        builder.configureStates()
-                .withStates()
-                .initial(configurations.getInitialState().getName())
-                .states(new HashSet<>(configurations.getAllStateNames()));
+        /* Configuring the states */
+        for (State state : states) {
+            builder.configureStates()
+                    .withStates()
+                    .state(state.getName());
+        }
+
+        /* Configuring the transitions */
+        for (Transition transition : transitions) {
+            builder.configureTransitions()
+                    .withExternal()
+                    .source(transition.getFromState())
+                    .target(transition.getToState())
+                    .event(transition.getEvent());
+        }
 
         return builder.build();
     }

@@ -7,6 +7,7 @@ import com.cloudlab.grpc.Tpc.AllocationResponse;
 import com.cloudlab.grpc.Tpc.NotificationMessage;
 import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc;
+import com.cloudlab.statemachine.StateMachineGenerator;
 import com.cloudlab.utils.Events;
 import com.cloudlab.utils.States;
 import io.grpc.ManagedChannel;
@@ -21,14 +22,14 @@ public class Client {
     private tpcGrpc.tpcBlockingStub stub;
     private final String clientID;
     private Integer timestamp;
-    private StateMachine<States, Events> stateMachine;
+    private StateMachine<String, String> stateMachine;
 
-    public Client(StateMachine<States, Events> stateMachine) {
+    public Client() throws Exception {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
         this.clientID = ThreadLocalRandom.current().toString();
         this.timestamp = 0;
-        this.stateMachine = stateMachine;
+        this.stateMachine = new StateMachineGenerator("src/main/resources/statemachine.yaml").buildMachine();
     }
 
     public void updateTimestamp(Integer timestamp) {
@@ -124,7 +125,7 @@ public class Client {
             isAllocated = this.sendAllocationRequest(event);
         }
 
-        this.stateMachine.sendEvent(event);
+        this.stateMachine.sendEvent(event.name());
         this.sendNotificationMessage(event);
     }
 
