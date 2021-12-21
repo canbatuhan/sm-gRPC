@@ -22,12 +22,12 @@ message ConnectionResponse {
 message AllocationRequest {
   string clientID = 1;
   int32 timestamp = 2;
-  string eventName = 3;
+  repeated string readFrom = 3;
+  repeated string writeTo = 4;
 }
 
 message AllocationResponse {
   int32 timestamp = 1;
-  string eventName = 2;
   bool response = 3;
 }
 
@@ -35,7 +35,8 @@ message AllocationResponse {
 message NotificationMessage {
   string clientID = 1;
   int32 timestamp = 2;
-  string eventName = 3;
+  repeated string readFrom = 3;
+  repeated string writeTo = 4;
 }
 
 message Empty {}

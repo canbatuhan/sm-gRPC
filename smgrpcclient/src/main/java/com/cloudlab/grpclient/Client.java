@@ -9,7 +9,6 @@ import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc;
 import com.cloudlab.statemachine.StateMachineGenerator;
 import com.cloudlab.utils.Events;
-import com.cloudlab.utils.States;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -58,12 +57,12 @@ public class Client {
      * @param event event that the client wants to trigger
      * @return AllocationRequest
      */
-    public AllocationRequest generateAllocationRequest(Events event) {
+    public AllocationRequest generateAllocationRequest(String event) {
         return AllocationRequest
                 .newBuilder()
                 .setClientID(this.clientID)
                 .setTimestamp(this.timestamp)
-                .setEventName(event.name())
+                .setEventName(event)
                 .build();
     }
 
@@ -72,12 +71,12 @@ public class Client {
      * @param event event that has been triggered by the client
      * @return NotificationMessage
      */
-    public NotificationMessage generateNotificationMessage(Events event) {
+    public NotificationMessage generateNotificationMessage(String event) {
         return NotificationMessage
                 .newBuilder()
                 .setClientID(this.clientID)
                 .setTimestamp(this.timestamp)
-                .setEventName(event.name())
+                .setEventName(event)
                 .build();
     }
 
@@ -97,7 +96,7 @@ public class Client {
      * @param event event that triggers the state machine
      * @return true if it is possible to allocate process time, else false
      */
-    public boolean sendAllocationRequest(Events event) {
+    public boolean sendAllocationRequest(String event) {
         AllocationRequest allocationRequest = this.generateAllocationRequest(event);
         AllocationResponse allocationResponse = this.stub.allocationService(allocationRequest);
         this.updateTimestamp(allocationResponse.getTimestamp());
@@ -108,7 +107,7 @@ public class Client {
      * Sends a message to server telling that the process has finished
      * @param event event that triggering the state machine
      */
-    public void sendNotificationMessage(Events event) {
+    public void sendNotificationMessage(String event) {
         NotificationMessage notificationMessage = this.generateNotificationMessage(event);
         Empty empty = this.stub.notifyingService(notificationMessage);
         this.updateTimestamp(this.timestamp);
@@ -133,7 +132,7 @@ public class Client {
      * Tries to allocate process time from server, then executes it
      * @param event event that will trigger the state machine
      */
-    public void allocateAndExecute(Events event) throws InterruptedException {
+    public void allocateAndExecute(String event) throws InterruptedException {
         boolean isAllocated = false;
         int turn = 0;
 
@@ -143,7 +142,7 @@ public class Client {
             isAllocated = this.sendAllocationRequest(event);
         }
 
-        this.stateMachine.sendEvent(event.name());
+        this.stateMachine.sendEvent(event);
         this.sendNotificationMessage(event);
     }
 
@@ -156,9 +155,10 @@ public class Client {
         boolean isAccepted = this.sendConnectionRequest();
 
         if (isAccepted) {
-            this.allocateAndExecute(Events.READ);
-            this.allocateAndExecute(Events.READ);
-            this.allocateAndExecute(Events.WRITE);
+            /*this.allocateAndExecute();
+            this.allocateAndExecute();
+            this.allocateAndExecute();
+            */
         }
 
         this.channel.shutdown();
