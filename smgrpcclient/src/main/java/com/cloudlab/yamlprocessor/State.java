@@ -1,27 +1,32 @@
 package com.cloudlab.yamlprocessor;
 
-import com.cloudlab.utils.Variables;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class State {
     private String name;
-    private Variables readVariable;
-    private Variables writeVariable;
+    private String readVariables;
+    private String writeVariables;
 
-    public State(String name, Variables readVariable, Variables writeVariable) {
+    public State() {
+        this.name = null;
+        this.readVariables = null;
+        this.writeVariables = null;
+    }
+
+    public State(String name, String readVariables, String writeVariables) {
         this.name = name;
-        this.readVariable = readVariable;
-        this.writeVariable = writeVariable;
+        if (readVariables == null) this.readVariables = "";
+        else this.readVariables = readVariables;
+        if (writeVariables == null) this.writeVariables = "";
+        this.writeVariables = writeVariables;
     }
 
     public String getName() {
         return name;
     }
 
-    public Variables getReadVariable() {
-        return readVariable;
-    }
+    public ArrayList<String> getReadVariables() { return (ArrayList<String>) Arrays.asList(readVariables.split(" ")); }
 
-    public Variables getWriteVariable() {
-        return writeVariable;
-    }
+    public ArrayList<String> getWriteVariables() { return (ArrayList<String>) Arrays.asList(writeVariables.split(" ")); }
 }

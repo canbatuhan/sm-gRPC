@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineBuilder;
+import org.springframework.statemachine.state.PseudoStateKind;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +52,13 @@ public class StateMachineGenerator {
 
         /* Configuring the states */
         for (State state : states) {
+            if (state.getName().equals("INITIAL")) {
+                builder.configureStates()
+                        .withStates()
+                        .initial("INITIAL");
+                continue;
+            }
+
             builder.configureStates()
                     .withStates()
                     .state(state.getName());

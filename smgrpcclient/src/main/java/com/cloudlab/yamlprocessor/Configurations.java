@@ -25,8 +25,45 @@ public class Configurations {
         return states;
     }
 
-    public ArrayList<Transition> getTransitions() {
-        return transitions;
+    public ArrayList<Transition> getTransitions() { return transitions; }
+
+
+
+    public ArrayList<String> getReadVariables(String fromState, String event) {
+        String toState;
+
+        // Traverse all transitions, until find the fromState and event
+        for (Transition transition : this.transitions) {
+            if (transition.getEvent().equals(event) && transition.getFromState().equals(fromState)) {
+                // Traverse in states, until find the toState, then get readVariable
+                toState = transition.getToState();
+                for (State state : this.states) {
+                    if (state.getName().equals(toState)) {
+                        return state.getReadVariables();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public ArrayList<String> getWriteVariables(String fromState, String event) {
+        String toState;
+
+        // Traverse all transitions, until find the fromState and event
+        for (Transition transition : this.transitions) {
+            if (transition.getEvent().equals(event) && transition.getFromState().equals(fromState)) {
+                // Traverse in states, until find the toState, then get writeVariable
+                toState = transition.getToState();
+                for (State state : this.states) {
+                    if (state.getName().equals(toState)) {
+                        return state.getWriteVariables();
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

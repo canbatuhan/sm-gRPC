@@ -4,42 +4,40 @@ autoStartup: false
 
 # States
 states:
-  - state:
-      name: "SI"
-      read: "A"
-      write: null
-  - state:
-      name: "S1"
-      read: "C"
-      write: "B"
-  - state:
-      name: "S2"
-      read: "C"
-      write: "A"
-  - state:
-      name: "S3"
-      read: "B"
-      write: "C"
+  - name: "INITIAL"
+    readVariables: "A"
+    writeVariables:
+
+  - name: "S1"
+    readVariables: "C"
+    writeVariables: "B"
+
+  - name: "S2"
+    readVariables: "C"
+    writeVariables: "A"
+
+  - name: "S3"
+    readVariables: "B"
+    writeVariables: "C"
 
 # Transitions & Events
 transitions:
-  - transition:
-      event: "EI1"
-      from: "SI"
-      to: "S1"
-  - transition:
-      event: "E12"
-      from: "S1"
-      to: "S2"
-  - transition:
-      event: "E21"
-      from: "S2"
-      to: "S1"
-  - transition:
-      event: "E13"
-      from: "S1"
-      to: "S3"
-  - transition:
-      event: "E32"
-      from: "S3"
-      to: "S2"
+  - event: "EI1"
+    fromState: "SI"
+    toState: "S1"
+
+  - event: "E12"
+    fromState: "S1"
+    toState: "S2"
+
+  - event: "E21"
+    fromState: "S2"
+    toState: "S1"
+
+  - event: "E13"
+    fromState: "S1"
+    toState: "S3"
+
+  - event: "E32"
+    fromState: "S3"
+    toState: "S2"
