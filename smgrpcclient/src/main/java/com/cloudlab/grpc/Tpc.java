@@ -1195,14 +1195,42 @@ public final class Tpc {
     int getTimestamp();
 
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
      */
-    java.lang.String getEventName();
+    java.util.List<java.lang.String>
+        getReadFromList();
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
+     */
+    int getReadFromCount();
+    /**
+     * <code>repeated string readFrom = 3;</code>
+     */
+    java.lang.String getReadFrom(int index);
+    /**
+     * <code>repeated string readFrom = 3;</code>
      */
     com.google.protobuf.ByteString
-        getEventNameBytes();
+        getReadFromBytes(int index);
+
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    java.util.List<java.lang.String>
+        getWriteToList();
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    int getWriteToCount();
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    java.lang.String getWriteTo(int index);
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getWriteToBytes(int index);
   }
   /**
    * <pre>
@@ -1223,7 +1251,8 @@ public final class Tpc {
     private AllocationRequest() {
       clientID_ = "";
       timestamp_ = 0;
-      eventName_ = "";
+      readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -1263,8 +1292,20 @@ public final class Tpc {
             }
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
-
-              eventName_ = s;
+              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+                readFrom_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000004;
+              }
+              readFrom_.add(s);
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+                writeTo_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000008;
+              }
+              writeTo_.add(s);
               break;
             }
             default: {
@@ -1282,6 +1323,12 @@ public final class Tpc {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+          readFrom_ = readFrom_.getUnmodifiableView();
+        }
+        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+          writeTo_ = writeTo_.getUnmodifiableView();
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -1299,6 +1346,7 @@ public final class Tpc {
               com.cloudlab.grpc.Tpc.AllocationRequest.class, com.cloudlab.grpc.Tpc.AllocationRequest.Builder.class);
     }
 
+    private int bitField0_;
     public static final int CLIENTID_FIELD_NUMBER = 1;
     private volatile java.lang.Object clientID_;
     /**
@@ -1342,38 +1390,62 @@ public final class Tpc {
       return timestamp_;
     }
 
-    public static final int EVENTNAME_FIELD_NUMBER = 3;
-    private volatile java.lang.Object eventName_;
+    public static final int READFROM_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList readFrom_;
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
      */
-    public java.lang.String getEventName() {
-      java.lang.Object ref = eventName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        eventName_ = s;
-        return s;
-      }
+    public com.google.protobuf.ProtocolStringList
+        getReadFromList() {
+      return readFrom_;
     }
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
+     */
+    public int getReadFromCount() {
+      return readFrom_.size();
+    }
+    /**
+     * <code>repeated string readFrom = 3;</code>
+     */
+    public java.lang.String getReadFrom(int index) {
+      return readFrom_.get(index);
+    }
+    /**
+     * <code>repeated string readFrom = 3;</code>
      */
     public com.google.protobuf.ByteString
-        getEventNameBytes() {
-      java.lang.Object ref = eventName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        eventName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+        getReadFromBytes(int index) {
+      return readFrom_.getByteString(index);
+    }
+
+    public static final int WRITETO_FIELD_NUMBER = 4;
+    private com.google.protobuf.LazyStringList writeTo_;
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getWriteToList() {
+      return writeTo_;
+    }
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public int getWriteToCount() {
+      return writeTo_.size();
+    }
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public java.lang.String getWriteTo(int index) {
+      return writeTo_.get(index);
+    }
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getWriteToBytes(int index) {
+      return writeTo_.getByteString(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1396,8 +1468,11 @@ public final class Tpc {
       if (timestamp_ != 0) {
         output.writeInt32(2, timestamp_);
       }
-      if (!getEventNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, eventName_);
+      for (int i = 0; i < readFrom_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, readFrom_.getRaw(i));
+      }
+      for (int i = 0; i < writeTo_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, writeTo_.getRaw(i));
       }
       unknownFields.writeTo(output);
     }
@@ -1415,8 +1490,21 @@ public final class Tpc {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, timestamp_);
       }
-      if (!getEventNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, eventName_);
+      {
+        int dataSize = 0;
+        for (int i = 0; i < readFrom_.size(); i++) {
+          dataSize += computeStringSizeNoTag(readFrom_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getReadFromList().size();
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < writeTo_.size(); i++) {
+          dataSize += computeStringSizeNoTag(writeTo_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getWriteToList().size();
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1438,8 +1526,10 @@ public final class Tpc {
           .equals(other.getClientID());
       result = result && (getTimestamp()
           == other.getTimestamp());
-      result = result && getEventName()
-          .equals(other.getEventName());
+      result = result && getReadFromList()
+          .equals(other.getReadFromList());
+      result = result && getWriteToList()
+          .equals(other.getWriteToList());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1455,8 +1545,14 @@ public final class Tpc {
       hash = (53 * hash) + getClientID().hashCode();
       hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
       hash = (53 * hash) + getTimestamp();
-      hash = (37 * hash) + EVENTNAME_FIELD_NUMBER;
-      hash = (53 * hash) + getEventName().hashCode();
+      if (getReadFromCount() > 0) {
+        hash = (37 * hash) + READFROM_FIELD_NUMBER;
+        hash = (53 * hash) + getReadFromList().hashCode();
+      }
+      if (getWriteToCount() > 0) {
+        hash = (37 * hash) + WRITETO_FIELD_NUMBER;
+        hash = (53 * hash) + getWriteToList().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1598,8 +1694,10 @@ public final class Tpc {
 
         timestamp_ = 0;
 
-        eventName_ = "";
-
+        readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -1626,9 +1724,21 @@ public final class Tpc {
       @java.lang.Override
       public com.cloudlab.grpc.Tpc.AllocationRequest buildPartial() {
         com.cloudlab.grpc.Tpc.AllocationRequest result = new com.cloudlab.grpc.Tpc.AllocationRequest(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.clientID_ = clientID_;
         result.timestamp_ = timestamp_;
-        result.eventName_ = eventName_;
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          readFrom_ = readFrom_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.readFrom_ = readFrom_;
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          writeTo_ = writeTo_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        }
+        result.writeTo_ = writeTo_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -1684,8 +1794,24 @@ public final class Tpc {
         if (other.getTimestamp() != 0) {
           setTimestamp(other.getTimestamp());
         }
-        if (!other.getEventName().isEmpty()) {
-          eventName_ = other.eventName_;
+        if (!other.readFrom_.isEmpty()) {
+          if (readFrom_.isEmpty()) {
+            readFrom_ = other.readFrom_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureReadFromIsMutable();
+            readFrom_.addAll(other.readFrom_);
+          }
+          onChanged();
+        }
+        if (!other.writeTo_.isEmpty()) {
+          if (writeTo_.isEmpty()) {
+            writeTo_ = other.writeTo_;
+            bitField0_ = (bitField0_ & ~0x00000008);
+          } else {
+            ensureWriteToIsMutable();
+            writeTo_.addAll(other.writeTo_);
+          }
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -1716,6 +1842,7 @@ public final class Tpc {
         }
         return this;
       }
+      private int bitField0_;
 
       private java.lang.Object clientID_ = "";
       /**
@@ -1812,71 +1939,190 @@ public final class Tpc {
         return this;
       }
 
-      private java.lang.Object eventName_ = "";
-      /**
-       * <code>string eventName = 3;</code>
-       */
-      public java.lang.String getEventName() {
-        java.lang.Object ref = eventName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          eventName_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      private com.google.protobuf.LazyStringList readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureReadFromIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          readFrom_ = new com.google.protobuf.LazyStringArrayList(readFrom_);
+          bitField0_ |= 0x00000004;
+         }
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getReadFromList() {
+        return readFrom_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public int getReadFromCount() {
+        return readFrom_.size();
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public java.lang.String getReadFrom(int index) {
+        return readFrom_.get(index);
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
        */
       public com.google.protobuf.ByteString
-          getEventNameBytes() {
-        java.lang.Object ref = eventName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          eventName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+          getReadFromBytes(int index) {
+        return readFrom_.getByteString(index);
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
        */
-      public Builder setEventName(
+      public Builder setReadFrom(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureReadFromIsMutable();
+        readFrom_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public Builder addReadFrom(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  
-        eventName_ = value;
+  ensureReadFromIsMutable();
+        readFrom_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
        */
-      public Builder clearEventName() {
-        
-        eventName_ = getDefaultInstance().getEventName();
+      public Builder addAllReadFrom(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureReadFromIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, readFrom_);
         onChanged();
         return this;
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
        */
-      public Builder setEventNameBytes(
+      public Builder clearReadFrom() {
+        readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public Builder addReadFromBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        
-        eventName_ = value;
+        ensureReadFromIsMutable();
+        readFrom_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureWriteToIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          writeTo_ = new com.google.protobuf.LazyStringArrayList(writeTo_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getWriteToList() {
+        return writeTo_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public int getWriteToCount() {
+        return writeTo_.size();
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public java.lang.String getWriteTo(int index) {
+        return writeTo_.get(index);
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getWriteToBytes(int index) {
+        return writeTo_.getByteString(index);
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder setWriteTo(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureWriteToIsMutable();
+        writeTo_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder addWriteTo(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureWriteToIsMutable();
+        writeTo_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder addAllWriteTo(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureWriteToIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, writeTo_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder clearWriteTo() {
+        writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder addWriteToBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureWriteToIsMutable();
+        writeTo_.add(value);
         onChanged();
         return this;
       }
@@ -1943,16 +2189,6 @@ public final class Tpc {
     int getTimestamp();
 
     /**
-     * <code>string eventName = 2;</code>
-     */
-    java.lang.String getEventName();
-    /**
-     * <code>string eventName = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getEventNameBytes();
-
-    /**
      * <code>bool response = 3;</code>
      */
     boolean getResponse();
@@ -1971,7 +2207,6 @@ public final class Tpc {
     }
     private AllocationResponse() {
       timestamp_ = 0;
-      eventName_ = "";
       response_ = false;
     }
 
@@ -2002,12 +2237,6 @@ public final class Tpc {
             case 8: {
 
               timestamp_ = input.readInt32();
-              break;
-            }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              eventName_ = s;
               break;
             }
             case 24: {
@@ -2056,40 +2285,6 @@ public final class Tpc {
       return timestamp_;
     }
 
-    public static final int EVENTNAME_FIELD_NUMBER = 2;
-    private volatile java.lang.Object eventName_;
-    /**
-     * <code>string eventName = 2;</code>
-     */
-    public java.lang.String getEventName() {
-      java.lang.Object ref = eventName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        eventName_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string eventName = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEventNameBytes() {
-      java.lang.Object ref = eventName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        eventName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
     public static final int RESPONSE_FIELD_NUMBER = 3;
     private boolean response_;
     /**
@@ -2116,9 +2311,6 @@ public final class Tpc {
       if (timestamp_ != 0) {
         output.writeInt32(1, timestamp_);
       }
-      if (!getEventNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, eventName_);
-      }
       if (response_ != false) {
         output.writeBool(3, response_);
       }
@@ -2134,9 +2326,6 @@ public final class Tpc {
       if (timestamp_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, timestamp_);
-      }
-      if (!getEventNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, eventName_);
       }
       if (response_ != false) {
         size += com.google.protobuf.CodedOutputStream
@@ -2160,8 +2349,6 @@ public final class Tpc {
       boolean result = true;
       result = result && (getTimestamp()
           == other.getTimestamp());
-      result = result && getEventName()
-          .equals(other.getEventName());
       result = result && (getResponse()
           == other.getResponse());
       result = result && unknownFields.equals(other.unknownFields);
@@ -2177,8 +2364,6 @@ public final class Tpc {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
       hash = (53 * hash) + getTimestamp();
-      hash = (37 * hash) + EVENTNAME_FIELD_NUMBER;
-      hash = (53 * hash) + getEventName().hashCode();
       hash = (37 * hash) + RESPONSE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getResponse());
@@ -2317,8 +2502,6 @@ public final class Tpc {
         super.clear();
         timestamp_ = 0;
 
-        eventName_ = "";
-
         response_ = false;
 
         return this;
@@ -2348,7 +2531,6 @@ public final class Tpc {
       public com.cloudlab.grpc.Tpc.AllocationResponse buildPartial() {
         com.cloudlab.grpc.Tpc.AllocationResponse result = new com.cloudlab.grpc.Tpc.AllocationResponse(this);
         result.timestamp_ = timestamp_;
-        result.eventName_ = eventName_;
         result.response_ = response_;
         onBuilt();
         return result;
@@ -2400,10 +2582,6 @@ public final class Tpc {
         if (other == com.cloudlab.grpc.Tpc.AllocationResponse.getDefaultInstance()) return this;
         if (other.getTimestamp() != 0) {
           setTimestamp(other.getTimestamp());
-        }
-        if (!other.getEventName().isEmpty()) {
-          eventName_ = other.eventName_;
-          onChanged();
         }
         if (other.getResponse() != false) {
           setResponse(other.getResponse());
@@ -2459,75 +2637,6 @@ public final class Tpc {
       public Builder clearTimestamp() {
         
         timestamp_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object eventName_ = "";
-      /**
-       * <code>string eventName = 2;</code>
-       */
-      public java.lang.String getEventName() {
-        java.lang.Object ref = eventName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          eventName_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string eventName = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getEventNameBytes() {
-        java.lang.Object ref = eventName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          eventName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string eventName = 2;</code>
-       */
-      public Builder setEventName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        eventName_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string eventName = 2;</code>
-       */
-      public Builder clearEventName() {
-        
-        eventName_ = getDefaultInstance().getEventName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string eventName = 2;</code>
-       */
-      public Builder setEventNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        eventName_ = value;
         onChanged();
         return this;
       }
@@ -2630,14 +2739,42 @@ public final class Tpc {
     int getTimestamp();
 
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
      */
-    java.lang.String getEventName();
+    java.util.List<java.lang.String>
+        getReadFromList();
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
+     */
+    int getReadFromCount();
+    /**
+     * <code>repeated string readFrom = 3;</code>
+     */
+    java.lang.String getReadFrom(int index);
+    /**
+     * <code>repeated string readFrom = 3;</code>
      */
     com.google.protobuf.ByteString
-        getEventNameBytes();
+        getReadFromBytes(int index);
+
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    java.util.List<java.lang.String>
+        getWriteToList();
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    int getWriteToCount();
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    java.lang.String getWriteTo(int index);
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getWriteToBytes(int index);
   }
   /**
    * <pre>
@@ -2658,7 +2795,8 @@ public final class Tpc {
     private NotificationMessage() {
       clientID_ = "";
       timestamp_ = 0;
-      eventName_ = "";
+      readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -2698,8 +2836,20 @@ public final class Tpc {
             }
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
-
-              eventName_ = s;
+              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+                readFrom_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000004;
+              }
+              readFrom_.add(s);
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+                writeTo_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000008;
+              }
+              writeTo_.add(s);
               break;
             }
             default: {
@@ -2717,6 +2867,12 @@ public final class Tpc {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+          readFrom_ = readFrom_.getUnmodifiableView();
+        }
+        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+          writeTo_ = writeTo_.getUnmodifiableView();
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -2734,6 +2890,7 @@ public final class Tpc {
               com.cloudlab.grpc.Tpc.NotificationMessage.class, com.cloudlab.grpc.Tpc.NotificationMessage.Builder.class);
     }
 
+    private int bitField0_;
     public static final int CLIENTID_FIELD_NUMBER = 1;
     private volatile java.lang.Object clientID_;
     /**
@@ -2777,38 +2934,62 @@ public final class Tpc {
       return timestamp_;
     }
 
-    public static final int EVENTNAME_FIELD_NUMBER = 3;
-    private volatile java.lang.Object eventName_;
+    public static final int READFROM_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList readFrom_;
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
      */
-    public java.lang.String getEventName() {
-      java.lang.Object ref = eventName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        eventName_ = s;
-        return s;
-      }
+    public com.google.protobuf.ProtocolStringList
+        getReadFromList() {
+      return readFrom_;
     }
     /**
-     * <code>string eventName = 3;</code>
+     * <code>repeated string readFrom = 3;</code>
+     */
+    public int getReadFromCount() {
+      return readFrom_.size();
+    }
+    /**
+     * <code>repeated string readFrom = 3;</code>
+     */
+    public java.lang.String getReadFrom(int index) {
+      return readFrom_.get(index);
+    }
+    /**
+     * <code>repeated string readFrom = 3;</code>
      */
     public com.google.protobuf.ByteString
-        getEventNameBytes() {
-      java.lang.Object ref = eventName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        eventName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+        getReadFromBytes(int index) {
+      return readFrom_.getByteString(index);
+    }
+
+    public static final int WRITETO_FIELD_NUMBER = 4;
+    private com.google.protobuf.LazyStringList writeTo_;
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getWriteToList() {
+      return writeTo_;
+    }
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public int getWriteToCount() {
+      return writeTo_.size();
+    }
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public java.lang.String getWriteTo(int index) {
+      return writeTo_.get(index);
+    }
+    /**
+     * <code>repeated string writeTo = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getWriteToBytes(int index) {
+      return writeTo_.getByteString(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2831,8 +3012,11 @@ public final class Tpc {
       if (timestamp_ != 0) {
         output.writeInt32(2, timestamp_);
       }
-      if (!getEventNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, eventName_);
+      for (int i = 0; i < readFrom_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, readFrom_.getRaw(i));
+      }
+      for (int i = 0; i < writeTo_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, writeTo_.getRaw(i));
       }
       unknownFields.writeTo(output);
     }
@@ -2850,8 +3034,21 @@ public final class Tpc {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, timestamp_);
       }
-      if (!getEventNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, eventName_);
+      {
+        int dataSize = 0;
+        for (int i = 0; i < readFrom_.size(); i++) {
+          dataSize += computeStringSizeNoTag(readFrom_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getReadFromList().size();
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < writeTo_.size(); i++) {
+          dataSize += computeStringSizeNoTag(writeTo_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getWriteToList().size();
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2873,8 +3070,10 @@ public final class Tpc {
           .equals(other.getClientID());
       result = result && (getTimestamp()
           == other.getTimestamp());
-      result = result && getEventName()
-          .equals(other.getEventName());
+      result = result && getReadFromList()
+          .equals(other.getReadFromList());
+      result = result && getWriteToList()
+          .equals(other.getWriteToList());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -2890,8 +3089,14 @@ public final class Tpc {
       hash = (53 * hash) + getClientID().hashCode();
       hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
       hash = (53 * hash) + getTimestamp();
-      hash = (37 * hash) + EVENTNAME_FIELD_NUMBER;
-      hash = (53 * hash) + getEventName().hashCode();
+      if (getReadFromCount() > 0) {
+        hash = (37 * hash) + READFROM_FIELD_NUMBER;
+        hash = (53 * hash) + getReadFromList().hashCode();
+      }
+      if (getWriteToCount() > 0) {
+        hash = (37 * hash) + WRITETO_FIELD_NUMBER;
+        hash = (53 * hash) + getWriteToList().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3033,8 +3238,10 @@ public final class Tpc {
 
         timestamp_ = 0;
 
-        eventName_ = "";
-
+        readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -3061,9 +3268,21 @@ public final class Tpc {
       @java.lang.Override
       public com.cloudlab.grpc.Tpc.NotificationMessage buildPartial() {
         com.cloudlab.grpc.Tpc.NotificationMessage result = new com.cloudlab.grpc.Tpc.NotificationMessage(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.clientID_ = clientID_;
         result.timestamp_ = timestamp_;
-        result.eventName_ = eventName_;
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          readFrom_ = readFrom_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.readFrom_ = readFrom_;
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          writeTo_ = writeTo_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        }
+        result.writeTo_ = writeTo_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -3119,8 +3338,24 @@ public final class Tpc {
         if (other.getTimestamp() != 0) {
           setTimestamp(other.getTimestamp());
         }
-        if (!other.getEventName().isEmpty()) {
-          eventName_ = other.eventName_;
+        if (!other.readFrom_.isEmpty()) {
+          if (readFrom_.isEmpty()) {
+            readFrom_ = other.readFrom_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureReadFromIsMutable();
+            readFrom_.addAll(other.readFrom_);
+          }
+          onChanged();
+        }
+        if (!other.writeTo_.isEmpty()) {
+          if (writeTo_.isEmpty()) {
+            writeTo_ = other.writeTo_;
+            bitField0_ = (bitField0_ & ~0x00000008);
+          } else {
+            ensureWriteToIsMutable();
+            writeTo_.addAll(other.writeTo_);
+          }
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -3151,6 +3386,7 @@ public final class Tpc {
         }
         return this;
       }
+      private int bitField0_;
 
       private java.lang.Object clientID_ = "";
       /**
@@ -3247,71 +3483,190 @@ public final class Tpc {
         return this;
       }
 
-      private java.lang.Object eventName_ = "";
-      /**
-       * <code>string eventName = 3;</code>
-       */
-      public java.lang.String getEventName() {
-        java.lang.Object ref = eventName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          eventName_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      private com.google.protobuf.LazyStringList readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureReadFromIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          readFrom_ = new com.google.protobuf.LazyStringArrayList(readFrom_);
+          bitField0_ |= 0x00000004;
+         }
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getReadFromList() {
+        return readFrom_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public int getReadFromCount() {
+        return readFrom_.size();
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public java.lang.String getReadFrom(int index) {
+        return readFrom_.get(index);
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
        */
       public com.google.protobuf.ByteString
-          getEventNameBytes() {
-        java.lang.Object ref = eventName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          eventName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+          getReadFromBytes(int index) {
+        return readFrom_.getByteString(index);
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
        */
-      public Builder setEventName(
+      public Builder setReadFrom(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureReadFromIsMutable();
+        readFrom_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public Builder addReadFrom(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  
-        eventName_ = value;
+  ensureReadFromIsMutable();
+        readFrom_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
        */
-      public Builder clearEventName() {
-        
-        eventName_ = getDefaultInstance().getEventName();
+      public Builder addAllReadFrom(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureReadFromIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, readFrom_);
         onChanged();
         return this;
       }
       /**
-       * <code>string eventName = 3;</code>
+       * <code>repeated string readFrom = 3;</code>
        */
-      public Builder setEventNameBytes(
+      public Builder clearReadFrom() {
+        readFrom_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string readFrom = 3;</code>
+       */
+      public Builder addReadFromBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        
-        eventName_ = value;
+        ensureReadFromIsMutable();
+        readFrom_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureWriteToIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          writeTo_ = new com.google.protobuf.LazyStringArrayList(writeTo_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getWriteToList() {
+        return writeTo_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public int getWriteToCount() {
+        return writeTo_.size();
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public java.lang.String getWriteTo(int index) {
+        return writeTo_.get(index);
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getWriteToBytes(int index) {
+        return writeTo_.getByteString(index);
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder setWriteTo(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureWriteToIsMutable();
+        writeTo_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder addWriteTo(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureWriteToIsMutable();
+        writeTo_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder addAllWriteTo(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureWriteToIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, writeTo_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder clearWriteTo() {
+        writeTo_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string writeTo = 4;</code>
+       */
+      public Builder addWriteToBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureWriteToIsMutable();
+        writeTo_.add(value);
         onChanged();
         return this;
       }
@@ -3822,18 +4177,18 @@ public final class Tpc {
       "\n\ttpc.proto\"8\n\021ConnectionRequest\022\020\n\010clie" +
       "ntID\030\001 \001(\t\022\021\n\ttimestamp\030\002 \001(\005\"9\n\022Connect" +
       "ionResponse\022\021\n\ttimestamp\030\001 \001(\005\022\020\n\010respon" +
-      "se\030\002 \001(\010\"K\n\021AllocationRequest\022\020\n\010clientI" +
-      "D\030\001 \001(\t\022\021\n\ttimestamp\030\002 \001(\005\022\021\n\teventName\030" +
-      "\003 \001(\t\"L\n\022AllocationResponse\022\021\n\ttimestamp" +
-      "\030\001 \001(\005\022\021\n\teventName\030\002 \001(\t\022\020\n\010response\030\003 " +
-      "\001(\010\"M\n\023NotificationMessage\022\020\n\010clientID\030\001" +
-      " \001(\t\022\021\n\ttimestamp\030\002 \001(\005\022\021\n\teventName\030\003 \001" +
-      "(\t\"\007\n\005Empty2\261\001\n\003tpc\022:\n\017GreetingService\022\022" +
-      ".ConnectionRequest\032\023.ConnectionResponse\022" +
-      "<\n\021AllocationService\022\022.AllocationRequest" +
-      "\032\023.AllocationResponse\0220\n\020NotifyingServic" +
-      "e\022\024.NotificationMessage\032\006.EmptyB\023\n\021com.c" +
-      "loudlab.grpcb\006proto3"
+      "se\030\002 \001(\010\"[\n\021AllocationRequest\022\020\n\010clientI" +
+      "D\030\001 \001(\t\022\021\n\ttimestamp\030\002 \001(\005\022\020\n\010readFrom\030\003" +
+      " \003(\t\022\017\n\007writeTo\030\004 \003(\t\"9\n\022AllocationRespo" +
+      "nse\022\021\n\ttimestamp\030\001 \001(\005\022\020\n\010response\030\003 \001(\010" +
+      "\"]\n\023NotificationMessage\022\020\n\010clientID\030\001 \001(" +
+      "\t\022\021\n\ttimestamp\030\002 \001(\005\022\020\n\010readFrom\030\003 \003(\t\022\017" +
+      "\n\007writeTo\030\004 \003(\t\"\007\n\005Empty2\261\001\n\003tpc\022:\n\017Gree" +
+      "tingService\022\022.ConnectionRequest\032\023.Connec" +
+      "tionResponse\022<\n\021AllocationService\022\022.Allo" +
+      "cationRequest\032\023.AllocationResponse\0220\n\020No" +
+      "tifyingService\022\024.NotificationMessage\032\006.E" +
+      "mptyB\023\n\021com.cloudlab.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3864,19 +4219,19 @@ public final class Tpc {
     internal_static_AllocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AllocationRequest_descriptor,
-        new java.lang.String[] { "ClientID", "Timestamp", "EventName", });
+        new java.lang.String[] { "ClientID", "Timestamp", "ReadFrom", "WriteTo", });
     internal_static_AllocationResponse_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_AllocationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AllocationResponse_descriptor,
-        new java.lang.String[] { "Timestamp", "EventName", "Response", });
+        new java.lang.String[] { "Timestamp", "Response", });
     internal_static_NotificationMessage_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_NotificationMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_NotificationMessage_descriptor,
-        new java.lang.String[] { "ClientID", "Timestamp", "EventName", });
+        new java.lang.String[] { "ClientID", "Timestamp", "ReadFrom", "WriteTo", });
     internal_static_Empty_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_Empty_fieldAccessorTable = new

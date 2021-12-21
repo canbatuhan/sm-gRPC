@@ -26,7 +26,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         this.timestamp = 0;
         this.clientMap = new HashMap<>();
         this.stateMap = new HashMap<>();
-        for (States state : States.values()) this.stateMap.put(state, false);
     }
 
     public void updateTimestamp(Integer timestamp) {
@@ -42,11 +41,10 @@ public class TwoPhaseCommitServices extends tpcImplBase {
                 .build();
     }
 
-    public AllocationResponse generateAllocationResponse(String eventName, boolean response) {
+    public AllocationResponse generateAllocationResponse(boolean response) {
         return AllocationResponse
                 .newBuilder()
                 .setTimestamp(this.timestamp)
-                .setEventName(eventName)
                 .setResponse(response)
                 .build();
     }
@@ -98,36 +96,13 @@ public class TwoPhaseCommitServices extends tpcImplBase {
     public void allocationService(AllocationRequest request, StreamObserver<AllocationResponse> responseObserver) {
         String clientID = request.getClientID();
         Integer timestamp = request.getTimestamp();
-        String eventName = request.getEventName();
 
         /* response logic (temporary) of allocation service */
-        Events event = Events.valueOf(eventName);
-        boolean response;
-
-        if (event == Events.WRITE && this.stateMap.get(States.S_writing)) {
-            System.out.println("There is already a " + event + " operation...");
-            response = false;
-        }
-
-        else {
-            System.out.println("Client can execute a " + event + " operation...");
-
-            if (event == Events.WRITE) {
-                this.stateMap.replace(States.S_writing, true);
-                this.clientMap.replace(clientID, States.S_writing);
-            }
-
-            else if (event == Events.READ) {
-                this.stateMap.replace(States.S_reading, true);
-                this.clientMap.replace(clientID, States.S_reading);
-            }
-
-            response = true;
-        }
+        boolean response = false;
 
         /* generate and send the response */
         this.updateTimestamp(timestamp);
-        AllocationResponse allocationResponse = this.generateAllocationResponse(eventName, response);
+        AllocationResponse allocationResponse = this.generateAllocationResponse(response);
         responseObserver.onNext(allocationResponse);
         responseObserver.onCompleted();
     }
@@ -141,19 +116,9 @@ public class TwoPhaseCommitServices extends tpcImplBase {
     public void notifyingService(NotificationMessage request, StreamObserver<Empty> responseObserver) {
         String clientID = request.getClientID();
         Integer timestamp = request.getTimestamp();
-        String eventName = request.getEventName();
 
         /* temporary operations in notifying service */
-        Events event = Events.valueOf(eventName);
-        if (event == Events.WRITE) {
-            this.stateMap.replace(States.S_writing, false);
-            this.clientMap.replace(clientID, States.S_waiting);
-        }
 
-        else if (event == Events.READ) {
-            this.stateMap.replace(States.S_reading, false);
-            this.clientMap.replace(clientID, States.S_waiting);
-        }
 
         /* generate and send the response */
         this.updateTimestamp(timestamp);

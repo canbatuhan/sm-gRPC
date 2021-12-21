@@ -31,19 +31,13 @@ public class Client {
         this.stateMachine = new StateMachineGenerator("src/main/resources/statemachine.yaml").buildMachine();
     }
 
-    /**
-     * Updates the timestamp according to the incoming response
-     * @param timestamp timestamp of the server
-     */
+
     public void updateTimestamp(Integer timestamp) {
         if (this.timestamp < timestamp) this.timestamp = timestamp + 1;
         else this.timestamp = this.timestamp + 1;
     }
 
-    /**
-     * Generates a connection request by using clientID and timestamp
-     * @return ConnectionRequest
-     */
+
     public ConnectionRequest generateConnectionRequest() {
         return ConnectionRequest
                 .newBuilder()
@@ -52,38 +46,25 @@ public class Client {
                 .build();
     }
 
-    /**
-     * Generates an allocation request to send to server
-     * @param event event that the client wants to trigger
-     * @return AllocationRequest
-     */
-    public AllocationRequest generateAllocationRequest(String event) {
+
+    public AllocationRequest generateAllocationRequest() {
         return AllocationRequest
                 .newBuilder()
                 .setClientID(this.clientID)
                 .setTimestamp(this.timestamp)
-                .setEventName(event)
                 .build();
     }
 
-    /**
-     * Generates a notification message to say the job is done
-     * @param event event that has been triggered by the client
-     * @return NotificationMessage
-     */
-    public NotificationMessage generateNotificationMessage(String event) {
+
+    public NotificationMessage generateNotificationMessage() {
         return NotificationMessage
                 .newBuilder()
                 .setClientID(this.clientID)
                 .setTimestamp(this.timestamp)
-                .setEventName(event)
                 .build();
     }
 
-    /**
-     * Sends a connection request to the server in order to introduce itself
-     * @return true if it is connected, else false
-     */
+
     public boolean sendConnectionRequest() {
         ConnectionRequest connectionRequest = this.generateConnectionRequest();
         ConnectionResponse connectionResponse = this.stub.greetingService(connectionRequest);
@@ -91,33 +72,22 @@ public class Client {
         return connectionResponse.getResponse();
     }
 
-    /**
-     * Sends a request to server in order to allocate a process time
-     * @param event event that triggers the state machine
-     * @return true if it is possible to allocate process time, else false
-     */
-    public boolean sendAllocationRequest(String event) {
-        AllocationRequest allocationRequest = this.generateAllocationRequest(event);
+
+    public boolean sendAllocationRequest() {
+        AllocationRequest allocationRequest = this.generateAllocationRequest();
         AllocationResponse allocationResponse = this.stub.allocationService(allocationRequest);
         this.updateTimestamp(allocationResponse.getTimestamp());
         return allocationResponse.getResponse();
     }
 
-    /**
-     * Sends a message to server telling that the process has finished
-     * @param event event that triggering the state machine
-     */
-    public void sendNotificationMessage(String event) {
-        NotificationMessage notificationMessage = this.generateNotificationMessage(event);
+
+    public void sendNotificationMessage() {
+        NotificationMessage notificationMessage = this.generateNotificationMessage();
         Empty empty = this.stub.notifyingService(notificationMessage);
         this.updateTimestamp(this.timestamp);
     }
 
-    /**
-     * Waits for a random time to send a allocation request again
-     * @param turn number of collisions (non-accepted allocation requests)
-     * @throws InterruptedException if thread fails to sleep
-     */
+
     public void poll(int turn) throws InterruptedException {
         double base = 0.0512;
         double constant = ThreadLocalRandom
@@ -128,22 +98,19 @@ public class Client {
         Thread.sleep((long) waitTime);
     }
 
-    /**
-     * Tries to allocate process time from server, then executes it
-     * @param event event that will trigger the state machine
-     */
-    public void allocateAndExecute(String event) throws InterruptedException {
+
+    public void allocateAndExecute() throws InterruptedException {
         boolean isAllocated = false;
         int turn = 0;
 
         while (!isAllocated) {
             this.poll(turn);
             turn = turn + 1;
-            isAllocated = this.sendAllocationRequest(event);
+            isAllocated = this.sendAllocationRequest();
         }
 
-        this.stateMachine.sendEvent(event);
-        this.sendNotificationMessage(event);
+        this.stateMachine.sendEvent("E");
+        this.sendNotificationMessage();
     }
 
     /**
@@ -155,10 +122,10 @@ public class Client {
         boolean isAccepted = this.sendConnectionRequest();
 
         if (isAccepted) {
-            /*this.allocateAndExecute();
             this.allocateAndExecute();
             this.allocateAndExecute();
-            */
+            this.allocateAndExecute();
+
         }
 
         this.channel.shutdown();
