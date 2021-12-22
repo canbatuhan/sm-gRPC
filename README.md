@@ -1,2 +1,2 @@
 # DistributedReadWrite
-Sandbox for me to deal with gRPC
+Read-write machine organization, which is going to be a distributed system when it grows up!
