@@ -10,13 +10,13 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="file://$USER_HOME$/Documents/GitHub/DistributedReadWrite/smgrpc" />
-          <root url="file://$USER_HOME$/Documents/GitHub/DistributedReadWrite/smgrpcclient" />
+          <root url="file://$MODULE_DIR$/../smgrpc" />
+          <root url="file://$MODULE_DIR$/../smgrpcclient" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$USER_HOME$/Documents/GitHub/DistributedReadWrite/smgrpc/src/main/java" />
-          <root url="file://$USER_HOME$/Documents/GitHub/DistributedReadWrite/smgrpcclient/src/main/java" />
+          <root url="file://$MODULE_DIR$/../smgrpc/src/main/java" />
+          <root url="file://$MODULE_DIR$/../smgrpcclient/src/main/java" />
         </SOURCES>
       </library>
     </orderEntry>

@@ -29,7 +29,7 @@ public class Configurations {
 
 
 
-    public ArrayList<String> getReadVariables(String fromState, String event) {
+    public ArrayList<Variable> getReadVariables(String fromState, String event) {
         String toState;
 
         // Traverse all transitions, until find the fromState and event
@@ -48,7 +48,7 @@ public class Configurations {
         return null;
     }
 
-    public ArrayList<String> getWriteVariables(String fromState, String event) {
+    public ArrayList<Variable> getWriteVariables(String fromState, String event) {
         String toState;
 
         // Traverse all transitions, until find the fromState and event

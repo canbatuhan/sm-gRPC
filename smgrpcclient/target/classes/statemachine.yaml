@@ -6,7 +6,7 @@ autoStartup: false
 states:
   - name: "INITIAL"
     readVariables: "A"
-    writeVariables:
+    writeVariables: "C"
 
   - name: "S1"
     readVariables: "C"

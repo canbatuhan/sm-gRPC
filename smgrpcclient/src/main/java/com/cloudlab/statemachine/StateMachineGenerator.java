@@ -15,9 +15,12 @@ import java.util.ArrayList;
 
 
 public class StateMachineGenerator {
-
     private final String configPath;
 
+    /**
+     * Builds a StateMachineGenerator which builds a state machine
+     * @param path input file which stores configuration details
+     */
     public StateMachineGenerator(String path) {
         this.configPath = path;
     }
@@ -48,20 +51,21 @@ public class StateMachineGenerator {
         builder.configureConfiguration()
                 .withConfiguration()
                 .machineId(configurations.getMachineID())
-                .autoStartup(configurations.isAutoStartup());
+                .autoStartup(configurations.isAutoStartup())
+                .listener(new BasicListener());
 
         /* Configuring the states */
         for (State state : states) {
             if (state.getName().equals("INITIAL")) {
                 builder.configureStates()
                         .withStates()
-                        .initial("INITIAL");
+                        .initial("INITIAL", new ReadWriteAction(state.getReadVariables(), state.getWriteVariables()));
                 continue;
             }
 
             builder.configureStates()
                     .withStates()
-                    .state(state.getName());
+                    .state(state.getName(), new ReadWriteAction(state.getReadVariables(), state.getWriteVariables()));
         }
 
         /* Configuring the transitions */
@@ -75,5 +79,4 @@ public class StateMachineGenerator {
 
         return builder.build();
     }
-
 }

@@ -13,15 +13,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
-/**
- * TwoPhaseCommitServices
- * will be rewritten in a more generic way
- */
 public class TwoPhaseCommitServices extends tpcImplBase {
-    private Integer timestamp;
-    private HashMap<String, Boolean> variableMap;
-    private HashSet<String> clientMap;
-
+    private Integer timestamp; // Timestamp of the server
+    private HashMap<String, Boolean> variableMap; // Map to check the variable status (in-use, available)
+    private HashSet<String> clientMap; // Set to see which clients are connected to the server
 
     /**
      * Builds TwoPhaseCommitServices object
@@ -32,7 +27,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         this.clientMap = new HashSet<>();
     }
 
-
     /**
      * Updates its timestamp according to the incoming message
      * @param timestamp incoming timestamp
@@ -41,7 +35,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         if (this.timestamp < timestamp) this.timestamp = timestamp + 1;
         else this.timestamp = this.timestamp + 1;
     }
-
 
     /**
      * Applies the logic for allocation, basically checks if any of the variables
@@ -100,7 +93,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         return response;
     }
 
-
     /**
      * Generates connection response message for client
      * @param response boolean value, server's on greeting the client
@@ -113,7 +105,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
                 .setResponse(response)
                 .build();
     }
-
 
     /**
      * Generates allocation response message to send to client
@@ -128,7 +119,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
                 .build();
     }
 
-
     /**
      * Generates empty message (response of notifyingService)
      * @return Empty message
@@ -138,7 +128,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
                 .newBuilder()
                 .build();
     }
-
 
     /**
      * greetingService, used when a client first connects to a server
@@ -173,7 +162,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         responseObserver.onCompleted();
     }
 
-
     /**
      * allocationService, used when a client wants to allocate a process time from the server
      * @param request, allocation message includes clientID, timeStamp, readFrom and writeTo
@@ -193,7 +181,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         responseObserver.onNext(allocationResponse);
         responseObserver.onCompleted();
     }
-
 
     /**
      * notifyingService, used when a client done with its process and release the allocation.
