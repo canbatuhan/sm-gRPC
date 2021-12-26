@@ -72,8 +72,7 @@ public class Client {
      * @return ConnectionRequest
      */
     public ConnectionRequest generateConnectionRequest() {
-        return ConnectionRequest
-                .newBuilder()
+        return ConnectionRequest.newBuilder()
                 .setClientID(this.clientID)
                 .setTimestamp(this.timestamp)
                 .build();

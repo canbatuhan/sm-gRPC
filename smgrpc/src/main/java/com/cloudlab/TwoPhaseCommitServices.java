@@ -52,7 +52,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         for (int index=0; index<numOfReadVariables; index++) {
             readVariable = request.getReadFrom(index);
 
-            // if the server face with this variable for the firs time, add it to map
+            // if the server face with this variable for the first time, add it to map
             if (!this.variableMap.containsKey(readVariable)) {
                 this.variableMap.put(readVariable, false);
             }
