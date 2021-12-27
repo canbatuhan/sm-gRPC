@@ -32,7 +32,6 @@ com\cloudlab\grpc\Tpc$ConnectionRequest.class
 com\cloudlab\grpc\tpcGrpc$tpcBaseDescriptorSupplier.class
 com\cloudlab\grpc\tpcGrpc$tpcMethodDescriptorSupplier.class
 com\cloudlab\grpc\Tpc$1.class
-com\cloudlab\yamlprocessor\Variable.class
 com\cloudlab\grpc\Tpc$Empty.class
 com\cloudlab\yamlprocessor\Transition.class
 com\cloudlab\grpc\tpcGrpc$1.class

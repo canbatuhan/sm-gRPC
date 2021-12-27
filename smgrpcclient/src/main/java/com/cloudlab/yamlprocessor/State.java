@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 public class State {
     private String name;
-    private ArrayList<Variable> readVariables;
-    private ArrayList<Variable> writeVariables;
+    private ArrayList<String> readVariables;
+    private ArrayList<String> writeVariables;
 
     public State() {
         this.name = null;
@@ -14,7 +14,7 @@ public class State {
         this.writeVariables = null;
     }
 
-    public State(String name, ArrayList<Variable> readVariables, ArrayList<Variable>  writeVariables) {
+    public State(String name, ArrayList<String> readVariables, ArrayList<String>  writeVariables) {
         this.name = name;
         this.readVariables = readVariables;
         this.writeVariables = writeVariables;
@@ -24,12 +24,12 @@ public class State {
         return name;
     }
 
-    public ArrayList<Variable> getReadVariables() {
+    public ArrayList<String> getReadVariables() {
         if (this.readVariables == null) return new ArrayList<> ();
         return this.readVariables;
     }
 
-    public ArrayList<Variable> getWriteVariables() {
+    public ArrayList<String> getWriteVariables() {
         if (this.writeVariables == null) return new ArrayList<> ();
         return this.writeVariables;
     }

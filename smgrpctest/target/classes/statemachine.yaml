@@ -1,0 +1,54 @@
+# Configurations
+machineID: "grpcStateMachine"
+autoStartup: false
+
+# States
+states:
+  - name: "INITIAL"
+    readVariables:
+      - name: "A"
+      - name: "B"
+    writeVariables:
+      - name: "C"
+
+  - name: "S1"
+    readVariables:
+      - name: "A"
+      - name: "C"
+    writeVariables:
+      - name: "B"
+
+  - name: "S2"
+    readVariables:
+      - name: "C"
+    writeVariables:
+      - name: "A"
+
+  - name: "S3"
+    readVariables:
+      - name: "B"
+    writeVariables:
+      - name: "C"
+      - name: "A"
+
+# Transitions & Events
+transitions:
+  - event: "EI1"
+    fromState: "INITIAL"
+    toState: "S1"
+
+  - event: "E12"
+    fromState: "S1"
+    toState: "S2"
+
+  - event: "E21"
+    fromState: "S2"
+    toState: "S1"
+
+  - event: "E13"
+    fromState: "S1"
+    toState: "S3"
+
+  - event: "E32"
+    fromState: "S3"
+    toState: "S2"

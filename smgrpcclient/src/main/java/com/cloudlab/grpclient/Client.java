@@ -9,7 +9,6 @@ import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc;
 import com.cloudlab.statemachine.StateMachineGenerator;
 import com.cloudlab.yamlprocessor.Configurations;
-import com.cloudlab.yamlprocessor.Variable;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -32,14 +31,27 @@ public class Client {
 
 
     /**
-     * Build Client object
+     * Builds a Client with the configurations from resources/statemachine.yaml
      */
     public Client() throws Exception {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
         this.clientID = ThreadLocalRandom.current().toString();
         this.timestamp = 0;
-        this.stateMachine = new StateMachineGenerator("src/main/resources/statemachine.yaml").buildMachine();
+        this.stateMachine = new StateMachineGenerator("src\\main\\resources\\statemachine.yaml").buildMachine();
+        this.inputQueue = new ConcurrentLinkedQueue<>();
+    }
+
+    /**
+     * Builds a Client with given state machine configs
+     * @param configPath file that includes state machine configuration details
+     */
+    public Client(String configPath) throws Exception {
+        this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
+        this.stub = tpcGrpc.newBlockingStub(channel);
+        this.clientID = ThreadLocalRandom.current().toString();
+        this.timestamp = 0;
+        this.stateMachine = new StateMachineGenerator(configPath).buildMachine();
         this.inputQueue = new ConcurrentLinkedQueue<>();
     }
 
@@ -84,7 +96,7 @@ public class Client {
      * @param writeVariables array storing the variables which will be written
      * @return AllocationRequest
      */
-    public AllocationRequest generateAllocationRequest(ArrayList<Variable> readVariables, ArrayList<Variable> writeVariables) {
+    public AllocationRequest generateAllocationRequest(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
         AllocationRequest allocationRequest = AllocationRequest
                 .newBuilder()
                 .setClientID(this.clientID)
@@ -93,7 +105,7 @@ public class Client {
 
         /* Adding readFrom variables to the request */
         int index = 0;
-        for (Variable readVariable : readVariables) {
+        for (String readVariable : readVariables) {
             allocationRequest
                     .toBuilder()
                     .setReadFrom(0, readVariable.toString())
@@ -103,7 +115,7 @@ public class Client {
 
         /* Adding writeTo variables to the request */
         index = 0;
-        for (Variable writeVariable : writeVariables) {
+        for (String writeVariable : writeVariables) {
             allocationRequest
                     .toBuilder()
                     .setWriteTo(index, writeVariable.toString())
@@ -120,7 +132,7 @@ public class Client {
      * @param writeVariables array storing the variables which will be written
      * @return NotificationRequest
      */
-    public NotificationMessage generateNotificationMessage(ArrayList<Variable> readVariables, ArrayList<Variable> writeVariables) {
+    public NotificationMessage generateNotificationMessage(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
         NotificationMessage notificationMessage = NotificationMessage
                 .newBuilder()
                 .setClientID(this.clientID)
@@ -129,20 +141,20 @@ public class Client {
 
         /* Adding readFrom variables to the message */
         int index = 0;
-        for (Variable readVariable : readVariables) {
+        for (String readVariable : readVariables) {
             notificationMessage
                     .toBuilder()
-                    .setReadFrom(0, readVariable.toString())
+                    .setReadFrom(0, readVariable)
                     .buildPartial();
             index += 1;
         }
 
         /* Adding writeTo variables to the message */
         index = 0;
-        for (Variable writeVariable : writeVariables) {
+        for (String writeVariable : writeVariables) {
             notificationMessage
                     .toBuilder()
-                    .setWriteTo(index, writeVariable.toString())
+                    .setWriteTo(index, writeVariable)
                     .buildPartial();
             index += 1;
         }
@@ -171,8 +183,8 @@ public class Client {
         String fromState = this.stateMachine.getState().getId();
 
         /* Get read and write variables */
-        ArrayList<Variable> readVariables = configurations.getReadVariables(fromState, event);
-        ArrayList<Variable> writeVariables = configurations.getWriteVariables(fromState, event);
+        ArrayList<String> readVariables = configurations.getReadVariables(fromState, event);
+        ArrayList<String> writeVariables = configurations.getWriteVariables(fromState, event);
 
         /* Generating and sending the request, receiving the response */
         AllocationRequest allocationRequest = this.generateAllocationRequest(readVariables, writeVariables);
@@ -184,15 +196,14 @@ public class Client {
 
     /**
      * Sends a notification message to the server
-     * @param event event that triggered the client
+     * @param currentState current state of the statemachine
      */
-    public void sendNotificationMessage(String event) {
+    public void sendNotificationMessage(String currentState) {
         Configurations configurations = new Configurations();
-        String fromState = this.stateMachine.getState().getId();
 
         /* Get read and write variables */
-        ArrayList<Variable> readVariables = configurations.getReadVariables(fromState, event);
-        ArrayList<Variable> writeVariables = configurations.getWriteVariables(fromState, event);
+        ArrayList<String> readVariables = configurations.getReadVariables(currentState);
+        ArrayList<String> writeVariables = configurations.getWriteVariables(currentState);
 
         NotificationMessage notificationMessage = this.generateNotificationMessage(readVariables, writeVariables);
         Empty empty = this.stub.notifyingService(notificationMessage);
@@ -227,7 +238,7 @@ public class Client {
         }
 
         this.stateMachine.sendEvent(event);
-        this.sendNotificationMessage(event);
+        this.sendNotificationMessage(this.stateMachine.getState().getId());
     }
 
     /**

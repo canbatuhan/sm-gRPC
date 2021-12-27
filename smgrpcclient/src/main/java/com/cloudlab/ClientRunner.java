@@ -8,7 +8,7 @@ public class ClientRunner {
 
     public static void main(String[] args) throws Exception {
         Client machine = new Client();
-        machine.readInput("C:\\Users\\Batuhan\\Documents\\GitHub\\DistributedReadWrite\\smgrpcclient\\eventInputs.txt");
+        machine.readInput("src\\main\\resources\\_eventInputs.txt");
         machine.run();
     }
 

@@ -27,9 +27,7 @@ public class Configurations {
 
     public ArrayList<Transition> getTransitions() { return transitions; }
 
-
-
-    public ArrayList<Variable> getReadVariables(String fromState, String event) {
+    public ArrayList<String> getReadVariables(String fromState, String event) {
         String toState;
 
         // Traverse all transitions, until find the fromState and event
@@ -45,10 +43,21 @@ public class Configurations {
             }
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
-    public ArrayList<Variable> getWriteVariables(String fromState, String event) {
+    public ArrayList<String> getReadVariables(String currentState) {
+        // traverse all states, until find the current state
+        for (State state : this.states) {
+            if (state.getName().equals(currentState)) {
+                return state.getReadVariables();
+            }
+        }
+
+        return new ArrayList<>();
+    }
+
+    public ArrayList<String> getWriteVariables(String fromState, String event) {
         String toState;
 
         // Traverse all transitions, until find the fromState and event
@@ -63,7 +72,18 @@ public class Configurations {
                 }
             }
         }
-        return null;
+        return new ArrayList<>();
+    }
+
+    public ArrayList<String> getWriteVariables(String currentState) {
+        // traverse all states, until find the current state
+        for (State state : this.states) {
+            if (state.getName().equals(currentState)) {
+                return state.getWriteVariables();
+            }
+        }
+
+        return new ArrayList<>();
     }
 
 }
