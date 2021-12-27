@@ -5,31 +5,20 @@ autoStartup: false
 # States
 states:
   - name: "INITIAL"
-    readVariables:
-      - name: "A"
-      - name: "B"
-    writeVariables:
-      - name: "C"
+    readVariables: ["A", "B"]
+    writeVariables: ["C"]
 
   - name: "S1"
-    readVariables:
-      - name: "A"
-      - name: "C"
-    writeVariables:
-      - name: "B"
+    readVariables: ["A", "C"]
+    writeVariables: ["B"]
 
   - name: "S2"
-    readVariables:
-      - name: "C"
-    writeVariables:
-      - name: "A"
+    readVariables: ["C"]
+    writeVariables: ["A"]
 
   - name: "S3"
-    readVariables:
-      - name: "B"
-    writeVariables:
-      - name: "C"
-      - name: "A"
+    readVariables: ["B"]
+    writeVariables: ["C", "A"]
 
 # Transitions & Events
 transitions:
