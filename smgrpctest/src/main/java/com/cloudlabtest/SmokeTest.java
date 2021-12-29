@@ -13,7 +13,7 @@ public class SmokeTest {
      * Thread for running the Client
      */
     public static class ClientThread extends Thread {
-        private final String inputPath = "src\\main\\resources\\_eventInputs.txt";
+        private final String inputPath = "src\\main\\resources\\_smokeTest.txt";
         private final String configPath = "src\\main\\resources\\statemachine.yaml";
 
         @Override
@@ -53,6 +53,10 @@ public class SmokeTest {
         }
     }
 
+    /**
+     * Runner of the SmokeTest
+     * @throws InterruptedException
+     */
     public void runTest() throws InterruptedException {
         Thread client = new ClientThread();
         Thread server = new ServerThread();
