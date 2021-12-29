@@ -6,8 +6,8 @@ import org.springframework.statemachine.action.Action;
 import java.util.ArrayList;
 
 public class ReadWriteAction implements Action<String, String> {
-    private ArrayList<String> readVariables;
-    private ArrayList<String> writeVariables;
+    private ArrayList<String> readVariables; // Variables that are used for reading
+    private ArrayList<String> writeVariables; // Variables that are used for writing
 
     /**
      * Builds a ReadWriteAction class, which runs read and write threads
@@ -33,11 +33,8 @@ public class ReadWriteAction implements Action<String, String> {
         writeThread.start();
     }
 
-    /**
-     * Class for running a read thread
-     */
     public static class ReadThread extends Thread {
-        private ArrayList<String> readVariables;
+        private ArrayList<String> readVariables; // Variables that the thread will read from
 
         /**
          * Builds a ReadThread object to read from variables
@@ -59,11 +56,8 @@ public class ReadWriteAction implements Action<String, String> {
         }
     }
 
-    /**
-     * Class for running a write thread
-     */
     public static class WriteThread extends Thread {
-        private ArrayList<String> writeVariables;
+        private ArrayList<String> writeVariables; // Variables that the thread write into
 
         /**
          * Builds a WriteThread object to write into variables

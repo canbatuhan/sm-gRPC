@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineBuilder;
-import org.springframework.statemachine.state.PseudoStateKind;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 
 
 public class StateMachineGenerator {
-    private final String configPath;
+    private final String configPath; // Configuration file that stores the state machine details
 
     /**
      * Builds a StateMachineGenerator which builds a state machine

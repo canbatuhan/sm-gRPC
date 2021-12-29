@@ -3,11 +3,14 @@ package com.cloudlab.yamlprocessor;
 import java.util.ArrayList;
 
 public class Configurations {
-    private String machineID;
-    private boolean autoStartup;
-    private ArrayList<State> states;
-    private ArrayList<Transition> transitions;
+    private String machineID; // Machine ID, preferably unique for each machine
+    private boolean autoStartup; // Whether if the state machine start automatically or not.
+    private ArrayList<State> states; // States of the state machine
+    private ArrayList<Transition> transitions; // Transitions in the state machine
 
+    /**
+     * Builds a Configurations object to read state machine configuration details
+     */
     public Configurations() {
         this.states = new ArrayList<>();
         this.transitions = new ArrayList<>();
