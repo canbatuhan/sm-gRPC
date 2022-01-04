@@ -99,7 +99,7 @@ public class Client {
      * Reads input from a file (for now)
      * @throws FileNotFoundException when there is a file error (can not opened)
      */
-    public void readEventInput() throws FileNotFoundException {
+    private void readEventInput() throws FileNotFoundException {
         FileReader fileReader = new FileReader(this.inputPath);
         Scanner scanner = new Scanner(fileReader);
 
@@ -113,7 +113,7 @@ public class Client {
      * Updates the timestamp according to the incoming timestamp
      * @param timestamp incoming timestamp
      */
-    public void updateTimestamp(Integer timestamp) {
+    private void updateTimestamp(Integer timestamp) {
         if (this.timestamp < timestamp) this.timestamp = timestamp + 1;
         else this.timestamp = this.timestamp + 1;
     }
@@ -122,7 +122,7 @@ public class Client {
      * Generates a connection request message to send to server
      * @return ConnectionRequest
      */
-    public ConnectionRequest generateConnectionRequest() {
+    private ConnectionRequest generateConnectionRequest() {
         return ConnectionRequest.newBuilder()
                 .setClientID(this.clientID)
                 .setTimestamp(this.timestamp)
@@ -135,7 +135,7 @@ public class Client {
      * @param writeVariables array storing the variables which will be written
      * @return AllocationRequest
      */
-    public AllocationRequest generateAllocationRequest(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
+    private AllocationRequest generateAllocationRequest(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
         AllocationRequest allocationRequest = AllocationRequest
                 .newBuilder()
                 .setClientID(this.clientID)
@@ -171,7 +171,7 @@ public class Client {
      * @param writeVariables array storing the variables which will be written
      * @return NotificationRequest
      */
-    public NotificationMessage generateNotificationMessage(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
+    private NotificationMessage generateNotificationMessage(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
         NotificationMessage notificationMessage = NotificationMessage
                 .newBuilder()
                 .setClientID(this.clientID)
@@ -205,7 +205,7 @@ public class Client {
      * Sends a connection request to the server
      * @return response, answer of the server
      */
-    public boolean sendConnectionRequest() {
+    private boolean sendConnectionRequest() {
         ConnectionRequest connectionRequest = this.generateConnectionRequest();
         ConnectionResponse connectionResponse = this.stub.greetingService(connectionRequest);
         this.updateTimestamp(connectionResponse.getTimestamp());
@@ -217,7 +217,7 @@ public class Client {
      * @param event event that will trigger the client
      * @return response, answer of the server about allocation request
      */
-    public boolean sendAllocationRequest(String event) throws IOException {
+    private boolean sendAllocationRequest(String event) {
         String fromState = this.stateMachine.getState().getId();
 
         /* Get read and write variables */
@@ -236,7 +236,7 @@ public class Client {
      * Sends a notification message to the server
      * @param currentState current state of the statemachine
      */
-    public void sendNotificationMessage(String currentState) throws IOException {
+    private void sendNotificationMessage(String currentState) {
         /* Get read and write variables */
         ArrayList<String> readVariables = this.configurations.getReadVariables(currentState);
         ArrayList<String> writeVariables = this.configurations.getWriteVariables(currentState);
@@ -250,7 +250,7 @@ public class Client {
      * Waits for a random time to send a request again
      * @param turn number of turn the client have polled
      */
-    public void backoffPoll(int turn) throws InterruptedException {
+    private void backoffPoll(int turn) throws InterruptedException {
         double base = 0.0512;
         double constant = ThreadLocalRandom
                 .current()
@@ -263,7 +263,7 @@ public class Client {
     /**
      * Builds string for logging of reading and writing actions
      */
-    public void recordEvent() throws IOException {
+    private void recordEvent() throws IOException {
         FileWriter fileWriter = new FileWriter(this.outputPath, true);
         String currentState = this.stateMachine.getState().getId();
 
@@ -296,7 +296,7 @@ public class Client {
     /**
      * Tries to allocate from server and execute its incoming event
      */
-    public void allocateAndExecute(String event) throws InterruptedException, IOException {
+    private void allocateAndExecute(String event) throws InterruptedException, IOException {
         boolean isAllocated = false;
         int turn = 0;
 

@@ -1,23 +1,64 @@
 package com.cloudlabtest.tests;
 
+import com.cloudlab.grpclient.Client;
+import com.cloudlabtest.threads.ClientThread;
+import com.cloudlabtest.threads.ServerThread;
 import com.cloudlabtest.yamlprocessor.Parameters;
+import com.cloudlabtest.yamlprocessor.TestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.grpc.Server;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MultiClients {
-    String paramsPath;
+    Parameters params;
+    ArrayList<ClientThread> clientThreads;
 
-    public MultiClients(String paramsPath) {
-        this.paramsPath = paramsPath;
+    /**
+     * Build MultiClient test with given parameters
+     * @param paramsPath file path includes test parameters
+     */
+    public MultiClients(String paramsPath) throws IOException {
+        this.params = this.readYamlInput(paramsPath);
+        this.clientThreads = new ArrayList<>();
     }
 
-    public Parameters readParams() throws IOException {
+    /**
+     * Reads yaml input
+     * @param paramsPath file path including test params
+     * @return Parameters object
+     */
+    private Parameters readYamlInput(String paramsPath) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
-        return mapper.readValue(new File(this.paramsPath), Parameters.class);
+        return mapper.readValue(new File(paramsPath), Parameters.class);
     }
 
+    /**
+     * Build list of ClientThreads in order to run in test
+     */
+    private void buildClientThreads() {
+        for (TestClient testClient : this.params.getClients()) {
+            clientThreads.add(new ClientThread(
+                    testClient.getConfigPath(),
+                    testClient.getInputPath(),
+                    testClient.getOutputPath()
+                )
+            );
+        }
+    }
+
+    /**
+     * Runner of the MultiClient test
+     */
+    public void runTest() throws InterruptedException {
+        ServerThread server = new ServerThread();
+
+        server.start();
+        Thread.sleep(100);
+        for (ClientThread clientThread : this.clientThreads) clientThread.start();
+    }
 }

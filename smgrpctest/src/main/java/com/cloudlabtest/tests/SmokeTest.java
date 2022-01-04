@@ -10,13 +10,13 @@ public class SmokeTest {
      * Runner of the SmokeTest
      */
     public void runTest() throws InterruptedException {
-        Thread client = new ClientThread(
+        ClientThread client = new ClientThread(
                 "C:\\Users\\Batuhan\\Documents\\GitHub\\DistributedReadWrite\\smgrpctest\\src\\main\\resources\\statemachine.yaml",
                 "C:\\Users\\Batuhan\\Documents\\GitHub\\DistributedReadWrite\\smgrpctest\\src\\main\\resources\\_smokeInput.txt",
                 "C:\\Users\\Batuhan\\Documents\\GitHub\\DistributedReadWrite\\smgrpctest\\src\\main\\resources\\_smokeOutput.txt"
         );
 
-        Thread server = new ServerThread();
+        ServerThread server = new ServerThread();
 
         server.start();
         Thread.sleep(100);
