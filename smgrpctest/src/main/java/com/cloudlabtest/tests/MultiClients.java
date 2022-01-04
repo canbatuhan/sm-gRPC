@@ -1,13 +1,11 @@
 package com.cloudlabtest.tests;
 
-import com.cloudlab.grpclient.Client;
 import com.cloudlabtest.threads.ClientThread;
 import com.cloudlabtest.threads.ServerThread;
 import com.cloudlabtest.yamlprocessor.Parameters;
 import com.cloudlabtest.yamlprocessor.TestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.grpc.Server;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +54,7 @@ public class MultiClients {
      */
     public void runTest() throws InterruptedException {
         ServerThread server = new ServerThread();
+        buildClientThreads();
 
         server.start();
         Thread.sleep(100);

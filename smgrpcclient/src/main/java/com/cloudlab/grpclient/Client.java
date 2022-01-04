@@ -306,8 +306,8 @@ public class Client {
             isAllocated = this.sendAllocationRequest(event);
         }
 
-        this.stateMachine.sendEvent(event);
         this.recordEvent();
+        this.stateMachine.sendEvent(event);
         this.sendNotificationMessage(this.stateMachine.getState().getId());
     }
 
@@ -319,7 +319,7 @@ public class Client {
         this.stateMachine.start();
 
         if (this.sendConnectionRequest()) {
-
+            System.out.println(this.clientID + " GOGOGO!");
             while (!inputQueue.isEmpty()) {
                 String event = inputQueue.poll();
                 this.allocateAndExecute(event);

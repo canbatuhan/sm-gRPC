@@ -144,14 +144,12 @@ public class TwoPhaseCommitServices extends tpcImplBase {
 
         // if the client is already connected, ignore message
         if (this.clientMap.contains(clientID)) {
-            System.out.println("Client " + clientID + " is already connected.");
             response = false;
         }
 
         // otherwise, say hello
         else {
             this.clientMap.add(clientID);
-            System.out.println("Hello " + clientID + ".");
             response = true;
         }
 
@@ -197,7 +195,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
 
         int numOfWriteVariable = request.getWriteToCount();
         for (int index=0; index<numOfWriteVariable; index++) {
-            writeVariable = request.getWriteTo(numOfWriteVariable);
+            writeVariable = request.getWriteTo(index);
             this.variableMap.replace(writeVariable, false);
         }
 
