@@ -9,12 +9,14 @@ import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc;
 import com.cloudlab.statemachine.StateMachineGenerator;
 import com.cloudlab.yamlprocessor.Configurations;
+import com.cloudlab.yamlprocessor.Transition;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.statemachine.StateMachine;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -26,42 +28,79 @@ public class Client {
     private tpcGrpc.tpcBlockingStub stub; // Stub storing the gRPC service methods
     private final String clientID; // Unique ID for each client
     private Integer timestamp; // Timestamp of the client
+    private Configurations configurations; // Configurations of the client's state machine
     private StateMachine<String, String> stateMachine; // State machine in which client executes its tasks
+    private String inputPath; // File path in where the inputs will be read
     private ConcurrentLinkedQueue<String> inputQueue; // Queue storing the inputs coming to the client
-
+    private String outputPath; // File path in where the results will be read (log)
 
     /**
-     * Builds a Client with the configurations from resources/statemachine.yaml
+     * Reads .yaml file to get the configurations
+     * @return Configuration object, filled with the yaml input
+     * @throws IOException readValue can give an error
      */
-    public Client() throws Exception {
+    private Configurations readYamlInput(String configPath) throws IOException {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        mapper.findAndRegisterModules();
+        return mapper.readValue(new File(configPath), Configurations.class);
+    }
+
+    /**
+     * Builds a Client with default configs and given input file path
+     * @param inputPath file that includes the event inputs
+     */
+    public Client(String inputPath) throws Exception {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
         this.clientID = ThreadLocalRandom.current().toString();
         this.timestamp = 0;
-        this.stateMachine = new StateMachineGenerator("src\\main\\resources\\statemachine.yaml").buildMachine();
+        this.configurations = this.readYamlInput("src\\resources\\statemachine.yaml");
+        this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();
+        this.inputPath = inputPath;
         this.inputQueue = new ConcurrentLinkedQueue<>();
     }
 
     /**
-     * Builds a Client with given state machine configs
+     * Builds a Client with given state machine configs and input file path
      * @param configPath file that includes state machine configuration details
+     * @param inputPath file that includes the event inputs
      */
-    public Client(String configPath) throws Exception {
+    public Client(String configPath, String inputPath) throws Exception {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
         this.clientID = ThreadLocalRandom.current().toString();
         this.timestamp = 0;
-        this.stateMachine = new StateMachineGenerator(configPath).buildMachine();
+        this.configurations = this.readYamlInput(configPath);
+        this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();
+        this.inputPath = inputPath;
         this.inputQueue = new ConcurrentLinkedQueue<>();
     }
+
+    /**
+     * Builds a Client with given state machine configs and input file path
+     * @param configPath file that includes state machine configuration details
+     * @param inputPath file that includes the event inputs
+     * @param outputPath file that the results will be written into
+     */
+    public Client(String configPath, String inputPath, String outputPath) throws Exception {
+        this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
+        this.stub = tpcGrpc.newBlockingStub(channel);
+        this.clientID = ThreadLocalRandom.current().toString();
+        this.timestamp = 0;
+        this.configurations = this.readYamlInput(configPath);
+        this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();
+        this.inputPath = inputPath;
+        this.inputQueue = new ConcurrentLinkedQueue<>();
+        this.outputPath = outputPath;
+    }
+
 
     /**
      * Reads input from a file (for now)
-     * @param filePath input file path
      * @throws FileNotFoundException when there is a file error (can not opened)
      */
-    public void readInput(String filePath) throws FileNotFoundException {
-        FileReader fileReader = new FileReader(filePath);
+    public void readEventInput() throws FileNotFoundException {
+        FileReader fileReader = new FileReader(this.inputPath);
         Scanner scanner = new Scanner(fileReader);
 
         while (scanner.hasNextLine()) {
@@ -108,7 +147,7 @@ public class Client {
         for (String readVariable : readVariables) {
             allocationRequest
                     .toBuilder()
-                    .setReadFrom(0, readVariable.toString())
+                    .addReadFrom(readVariable)
                     .buildPartial();
             index += 1;
         }
@@ -118,7 +157,7 @@ public class Client {
         for (String writeVariable : writeVariables) {
             allocationRequest
                     .toBuilder()
-                    .setWriteTo(index, writeVariable.toString())
+                    .addWriteTo(writeVariable)
                     .buildPartial();
             index += 1;
         }
@@ -144,7 +183,7 @@ public class Client {
         for (String readVariable : readVariables) {
             notificationMessage
                     .toBuilder()
-                    .setReadFrom(0, readVariable)
+                    .addReadFrom(readVariable)
                     .buildPartial();
             index += 1;
         }
@@ -154,7 +193,7 @@ public class Client {
         for (String writeVariable : writeVariables) {
             notificationMessage
                     .toBuilder()
-                    .setWriteTo(index, writeVariable)
+                    .addWriteTo(writeVariable)
                     .buildPartial();
             index += 1;
         }
@@ -178,13 +217,12 @@ public class Client {
      * @param event event that will trigger the client
      * @return response, answer of the server about allocation request
      */
-    public boolean sendAllocationRequest(String event) {
-        Configurations configurations = new Configurations();
+    public boolean sendAllocationRequest(String event) throws IOException {
         String fromState = this.stateMachine.getState().getId();
 
         /* Get read and write variables */
-        ArrayList<String> readVariables = configurations.getReadVariables(fromState, event);
-        ArrayList<String> writeVariables = configurations.getWriteVariables(fromState, event);
+        ArrayList<String> readVariables = this.configurations.getReadVariables(fromState, event);
+        ArrayList<String> writeVariables = this.configurations.getWriteVariables(fromState, event);
 
         /* Generating and sending the request, receiving the response */
         AllocationRequest allocationRequest = this.generateAllocationRequest(readVariables, writeVariables);
@@ -198,12 +236,10 @@ public class Client {
      * Sends a notification message to the server
      * @param currentState current state of the statemachine
      */
-    public void sendNotificationMessage(String currentState) {
-        Configurations configurations = new Configurations();
-
+    public void sendNotificationMessage(String currentState) throws IOException {
         /* Get read and write variables */
-        ArrayList<String> readVariables = configurations.getReadVariables(currentState);
-        ArrayList<String> writeVariables = configurations.getWriteVariables(currentState);
+        ArrayList<String> readVariables = this.configurations.getReadVariables(currentState);
+        ArrayList<String> writeVariables = this.configurations.getWriteVariables(currentState);
 
         NotificationMessage notificationMessage = this.generateNotificationMessage(readVariables, writeVariables);
         Empty empty = this.stub.notifyingService(notificationMessage);
@@ -225,9 +261,42 @@ public class Client {
     }
 
     /**
+     * Builds string for logging of reading and writing actions
+     */
+    public void recordEvent() throws IOException {
+        FileWriter fileWriter = new FileWriter(this.outputPath, true);
+        String currentState = this.stateMachine.getState().getId();
+
+        StringBuilder log;
+        StringBuilder clientEventLog = new StringBuilder();
+
+        clientEventLog
+                .append("[x] ")
+                .append(this.timestamp)
+                .append("\t")
+                .append(this.clientID)
+                .append("\t")
+                .append(this.stateMachine.getState().getId());
+
+        clientEventLog.append("\tRead Variables: ");
+        for (String readVariable : this.configurations.getReadVariables(currentState)) {
+            clientEventLog.append(readVariable).append(" ");
+        }
+
+        clientEventLog.append("\tWrite Variables: ");
+        for (String writeVariable : this.configurations.getWriteVariables(currentState)) {
+            clientEventLog.append(writeVariable).append(" ");
+        }
+
+        clientEventLog.append("\n");
+        fileWriter.write(String.valueOf(clientEventLog));
+        fileWriter.close();
+    }
+
+    /**
      * Tries to allocate from server and execute its incoming event
      */
-    public void allocateAndExecute(String event) throws InterruptedException {
+    public void allocateAndExecute(String event) throws InterruptedException, IOException {
         boolean isAllocated = false;
         int turn = 0;
 
@@ -238,23 +307,25 @@ public class Client {
         }
 
         this.stateMachine.sendEvent(event);
+        this.recordEvent();
         this.sendNotificationMessage(this.stateMachine.getState().getId());
     }
 
     /**
      * Runner for the client (preferably an infinite loop)
      */
-    public void run() throws InterruptedException {
+    public void run() throws InterruptedException, IOException {
+        this.readEventInput();
         this.stateMachine.start();
 
         if (this.sendConnectionRequest()) {
-            System.out.println("GO!");
 
             while (!inputQueue.isEmpty()) {
                 String event = inputQueue.poll();
                 this.allocateAndExecute(event);
                 Thread.sleep(500);
             }
+
         }
 
         this.channel.shutdown();

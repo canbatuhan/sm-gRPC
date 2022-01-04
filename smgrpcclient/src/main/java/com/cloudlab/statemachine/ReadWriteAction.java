@@ -26,56 +26,12 @@ public class ReadWriteAction implements Action<String, String> {
      */
     @Override
     public void execute(StateContext<String, String> stateContext) {
-        Thread readThread = new ReadThread(this.readVariables);
-        Thread writeThread = new WriteThread(this.writeVariables);
-
-        readThread.start();
-        writeThread.start();
-    }
-
-    public static class ReadThread extends Thread {
-        private ArrayList<String> readVariables; // Variables that the thread will read from
-
-        /**
-         * Builds a ReadThread object to read from variables
-         * @param readVariables list of variables to read data from
-         */
-        public ReadThread(ArrayList<String> readVariables) {
-            super();
-            this.readVariables = readVariables;
+        for (String readVariable : this.readVariables) {
+            System.out.println("Reading from " + readVariable + "...");
         }
 
-        /**
-         * Runs the thread
-         */
-        @Override
-        public void run() {
-            for (String readVariable : this.readVariables) {
-                System.out.println("Pseudo-reading on " + readVariable + "...");
-            }
-        }
-    }
-
-    public static class WriteThread extends Thread {
-        private ArrayList<String> writeVariables; // Variables that the thread write into
-
-        /**
-         * Builds a WriteThread object to write into variables
-         * @param writeVariables list of variables to write data into
-         */
-        public WriteThread(ArrayList<String> writeVariables) {
-            super();
-            this.writeVariables = writeVariables;
-        }
-
-        /**
-         * Runs the thread
-         */
-        @Override
-        public void run() {
-            for (String writeVariable : this.writeVariables) {
-                System.out.println("Pseudo-writing on " + writeVariable + "...");
-            }
+        for (String writeVariable : this.writeVariables) {
+            System.out.println("Writing into " + writeVariable + "...");
         }
     }
 }

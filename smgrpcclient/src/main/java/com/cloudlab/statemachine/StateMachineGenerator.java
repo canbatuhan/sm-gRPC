@@ -14,34 +14,22 @@ import java.util.ArrayList;
 
 
 public class StateMachineGenerator {
-    private final String configPath; // Configuration file that stores the state machine details
+    private final Configurations configurations; // Configuration file that stores the state machine details
 
     /**
      * Builds a StateMachineGenerator which builds a state machine
-     * @param path input file which stores configuration details
+     * @param configurations configuration details
      */
-    public StateMachineGenerator(String path) {
-        this.configPath = path;
-    }
-
-    /**
-     * Reads .yaml file to get the configurations
-     * @return Configuration object, filled with the yaml input
-     * @throws IOException readValue can give an error
-     */
-    private Configurations readYamlInput() throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.findAndRegisterModules();
-        return mapper.readValue(new File(this.configPath), Configurations.class);
+    public StateMachineGenerator(Configurations configurations) {
+        this.configurations = configurations;
     }
 
     /**
      * Builds a state machine according to the inputs by using StateMachineBuilder
      * @return StateMachine<String, String>
-     * @throws Exception readYamlInput can give an error
      */
     public StateMachine<String, String> buildMachine() throws Exception {
-        Configurations configurations = this.readYamlInput();
+        Configurations configurations = this.configurations;
         ArrayList<State> states = configurations.getStates();
         ArrayList<Transition> transitions = configurations.getTransitions();
 
