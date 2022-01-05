@@ -334,13 +334,11 @@ public class Client {
         this.stateMachine.start();
 
         if (this.sendConnectionRequest()) {
-            System.out.println(this.clientID + " GOGOGO!");
             while (!inputQueue.isEmpty()) {
                 String event = inputQueue.poll();
                 this.allocateAndExecute(event);
                 Thread.sleep(500);
             }
-
         }
 
         this.channel.shutdown();

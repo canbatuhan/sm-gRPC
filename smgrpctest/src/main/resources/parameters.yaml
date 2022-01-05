@@ -1,12 +1,8 @@
 clients:
   - configPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/statemachine.yaml"
     inputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientIn1.txt"
-    outputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientOut1.txt"
+    outputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientCommon.txt"
 
   - configPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/statemachine.yaml"
     inputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientIn2.txt"
-    outputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientOut2.txt"
-
-  - configPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/statemachine.yaml"
-    inputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientIn3.txt"
-    outputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientOut3.txt"
+    outputPath: "C:/Users/Batuhan/Documents/GitHub/DistributedReadWrite/smgrpctest/src/main/resources/_multiClientCommon.txt"
