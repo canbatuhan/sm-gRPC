@@ -18,6 +18,7 @@ import org.springframework.statemachine.StateMachine;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -46,13 +47,27 @@ public class Client {
     }
 
     /**
+     * Generates a ID for the client
+     * @return unique ID
+     */
+    private String generateID() {
+        Random randomStringBuilder = new Random();
+
+        return randomStringBuilder
+                .ints(97, 122+1)
+                .limit(10)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
+
+    /**
      * Builds a Client with default configs and given input file path
      * @param inputPath file that includes the event inputs
      */
     public Client(String inputPath) throws Exception {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
-        this.clientID = ThreadLocalRandom.current().toString();
+        this.clientID = this.generateID();
         this.timestamp = 0;
         this.configurations = this.readYamlInput("src\\resources\\statemachine.yaml");
         this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();
@@ -68,7 +83,7 @@ public class Client {
     public Client(String configPath, String inputPath) throws Exception {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
-        this.clientID = ThreadLocalRandom.current().toString();
+        this.clientID = this.generateID();
         this.timestamp = 0;
         this.configurations = this.readYamlInput(configPath);
         this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();
@@ -85,7 +100,7 @@ public class Client {
     public Client(String configPath, String inputPath, String outputPath) throws Exception {
         this.channel = ManagedChannelBuilder.forAddress("localhost", 9090).usePlaintext().build();
         this.stub = tpcGrpc.newBlockingStub(channel);
-        this.clientID = ThreadLocalRandom.current().toString();
+        this.clientID = this.generateID();
         this.timestamp = 0;
         this.configurations = this.readYamlInput(configPath);
         this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();

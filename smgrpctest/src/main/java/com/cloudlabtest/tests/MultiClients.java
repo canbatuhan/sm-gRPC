@@ -58,6 +58,8 @@ public class MultiClients {
 
         server.start();
         Thread.sleep(100);
-        for (ClientThread clientThread : this.clientThreads) clientThread.start();
+        for (ClientThread clientThread : this.clientThreads) {
+            clientThread.start();
+        }
     }
 }
