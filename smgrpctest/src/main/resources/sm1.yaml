@@ -5,20 +5,20 @@ autoStartup: false
 # States
 states:
   - name: "INITIAL"
-    readVariables: ["A", "B"]
-    writeVariables: ["C"]
+    readVariables: []
+    writeVariables: []
 
   - name: "S1"
-    readVariables: ["A", "C"]
-    writeVariables: ["B"]
+    readVariables: ["V1"]
+    writeVariables: []
 
   - name: "S2"
-    readVariables: ["C"]
-    writeVariables: ["A"]
+    readVariables: []
+    writeVariables: ["V1"]
 
-  - name: "S3"
-    readVariables: ["B"]
-    writeVariables: ["C", "A"]
+  - name: "END"
+    readVariables: []
+    writeVariables: []
 
 # Transitions & Events
 transitions:
@@ -34,10 +34,6 @@ transitions:
     fromState: "S2"
     toState: "S1"
 
-  - event: "E13"
-    fromState: "S1"
-    toState: "S3"
-
-  - event: "E32"
-    fromState: "S3"
-    toState: "S2"
+  - event: "E2F"
+    fromState: "S2"
+    toState: "END"

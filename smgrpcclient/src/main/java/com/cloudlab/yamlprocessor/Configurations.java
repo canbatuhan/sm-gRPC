@@ -89,4 +89,13 @@ public class Configurations {
         return new ArrayList<>();
     }
 
+    public String getToState(String fromState, String event) {
+        for (Transition transition : this.transitions) {
+            if (transition.getFromState().equals(fromState) && transition.getEvent().equals(event)) {
+                return transition.getToState();
+            }
+        }
+
+        return "CAN NOT FOUND";
+    }
 }

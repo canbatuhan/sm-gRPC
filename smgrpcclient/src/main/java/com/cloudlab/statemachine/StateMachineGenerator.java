@@ -46,13 +46,20 @@ public class StateMachineGenerator {
             if (state.getName().equals("INITIAL")) {
                 builder.configureStates()
                         .withStates()
-                        .initial("INITIAL", new ReadWriteAction(state.getReadVariables(), state.getWriteVariables()));
-                continue;
+                        .initial("INITIAL");
             }
 
-            builder.configureStates()
-                    .withStates()
-                    .state(state.getName(), new ReadWriteAction(state.getReadVariables(), state.getWriteVariables()));
+            else if (state.getName().equals("END")) {
+                builder.configureStates()
+                        .withStates()
+                        .end("END");
+            }
+
+            else {
+                builder.configureStates()
+                        .withStates()
+                        .state(state.getName(), new ReadWriteAction(state.getReadVariables(), state.getWriteVariables()));
+            }
         }
 
         /* Configuring the transitions */

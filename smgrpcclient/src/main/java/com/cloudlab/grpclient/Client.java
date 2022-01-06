@@ -1,5 +1,6 @@
 package com.cloudlab.grpclient;
 
+import com.cloudlab.grpc.Tpc;
 import com.cloudlab.grpc.Tpc.ConnectionRequest;
 import com.cloudlab.grpc.Tpc.ConnectionResponse;
 import com.cloudlab.grpc.Tpc.AllocationRequest;
@@ -18,7 +19,6 @@ import org.springframework.statemachine.StateMachine;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -51,13 +51,10 @@ public class Client {
      * @return unique ID
      */
     private String generateID() {
-        Random randomStringBuilder = new Random();
-
-        return randomStringBuilder
-                .ints(97, 122+1)
-                .limit(10)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
+        String base = "Client #";
+        int lowerLimit = 1773;
+        int upperLimit = 9999;
+        return base + ThreadLocalRandom.current().nextInt(lowerLimit, upperLimit+1);
     }
 
     /**
@@ -69,10 +66,11 @@ public class Client {
         this.stub = tpcGrpc.newBlockingStub(channel);
         this.clientID = this.generateID();
         this.timestamp = 0;
-        this.configurations = this.readYamlInput("src\\resources\\statemachine.yaml");
+        this.configurations = this.readYamlInput("src\\main\\resources\\statemachine.yaml");
         this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();
         this.inputPath = inputPath;
         this.inputQueue = new ConcurrentLinkedQueue<>();
+        this.outputPath = "src\\main\\resources\\output.txt";
     }
 
     /**
@@ -89,6 +87,7 @@ public class Client {
         this.stateMachine = new StateMachineGenerator(this.configurations).buildMachine();
         this.inputPath = inputPath;
         this.inputQueue = new ConcurrentLinkedQueue<>();
+        this.outputPath = "src\\main\\resources\\output.txt";
     }
 
     /**
@@ -151,33 +150,29 @@ public class Client {
      * @return AllocationRequest
      */
     private AllocationRequest generateAllocationRequest(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
-        AllocationRequest allocationRequest = AllocationRequest
+        AllocationRequest.Builder allocationRequest = AllocationRequest
                 .newBuilder()
                 .setClientID(this.clientID)
-                .setTimestamp(this.timestamp)
-                .buildPartial();
+                .setTimestamp(this.timestamp);
 
-        /* Adding readFrom variables to the request */
+        /* Adding readFrom Variables To Request */
         int index = 0;
         for (String readVariable : readVariables) {
             allocationRequest
-                    .toBuilder()
-                    .addReadFrom(readVariable)
-                    .buildPartial();
+                    .addReadFrom(readVariable);
             index += 1;
         }
 
-        /* Adding writeTo variables to the request */
+        /* Adding writeTo Variables To Request */
         index = 0;
         for (String writeVariable : writeVariables) {
             allocationRequest
-                    .toBuilder()
                     .addWriteTo(writeVariable)
                     .buildPartial();
             index += 1;
         }
 
-        return allocationRequest;
+        return allocationRequest.build();
     }
 
     /**
@@ -187,33 +182,30 @@ public class Client {
      * @return NotificationRequest
      */
     private NotificationMessage generateNotificationMessage(ArrayList<String> readVariables, ArrayList<String> writeVariables) {
-        NotificationMessage notificationMessage = NotificationMessage
+        NotificationMessage.Builder notificationMessage = NotificationMessage
                 .newBuilder()
                 .setClientID(this.clientID)
-                .setTimestamp(this.timestamp)
-                .buildPartial();
+                .setTimestamp(this.timestamp);
 
-        /* Adding readFrom variables to the message */
+        /* Adding readFrom Variables To Message */
         int index = 0;
         for (String readVariable : readVariables) {
             notificationMessage
-                    .toBuilder()
                     .addReadFrom(readVariable)
                     .buildPartial();
             index += 1;
         }
 
-        /* Adding writeTo variables to the message */
+        /* Adding writeTo Variables To Message */
         index = 0;
         for (String writeVariable : writeVariables) {
             notificationMessage
-                    .toBuilder()
                     .addWriteTo(writeVariable)
                     .buildPartial();
             index += 1;
         }
 
-        return notificationMessage;
+        return notificationMessage.build();
     }
 
     /**
@@ -235,11 +227,11 @@ public class Client {
     private boolean sendAllocationRequest(String event) {
         String fromState = this.stateMachine.getState().getId();
 
-        /* Get read and write variables */
+        /* Getting Read And Write Variables */
         ArrayList<String> readVariables = this.configurations.getReadVariables(fromState, event);
         ArrayList<String> writeVariables = this.configurations.getWriteVariables(fromState, event);
 
-        /* Generating and sending the request, receiving the response */
+        /* Generating And Sending The Request, Receiving Response */
         AllocationRequest allocationRequest = this.generateAllocationRequest(readVariables, writeVariables);
         AllocationResponse allocationResponse = this.stub.allocationService(allocationRequest);
 
@@ -252,10 +244,11 @@ public class Client {
      * @param currentState current state of the statemachine
      */
     private void sendNotificationMessage(String currentState) {
-        /* Get read and write variables */
+        /* Getting Read And Write Variables */
         ArrayList<String> readVariables = this.configurations.getReadVariables(currentState);
         ArrayList<String> writeVariables = this.configurations.getWriteVariables(currentState);
 
+        /* Generating And Sending The Message */
         NotificationMessage notificationMessage = this.generateNotificationMessage(readVariables, writeVariables);
         Empty empty = this.stub.notifyingService(notificationMessage);
         this.updateTimestamp(this.timestamp);
@@ -278,28 +271,29 @@ public class Client {
     /**
      * Builds string for logging of reading and writing actions
      */
-    private void recordEvent() throws IOException {
+    private void recordEvent(String event, String successOrAttempt) throws IOException {
         FileWriter fileWriter = new FileWriter(this.outputPath, true);
-        String currentState = this.stateMachine.getState().getId();
+        String fromState = this.stateMachine.getState().getId();
+        String toState = this.configurations.getToState(fromState, event);
 
-        StringBuilder log;
+        /* Building Log String */
         StringBuilder clientEventLog = new StringBuilder();
-
         clientEventLog
                 .append("[x] ")
-                .append(this.timestamp)
-                .append("\t")
-                .append(this.clientID)
-                .append("\t")
-                .append(this.stateMachine.getState().getId());
+                .append(this.timestamp).append(" | ")
+                .append(this.clientID).append(" | ")
+                .append(successOrAttempt).append(" | ")
+                .append(toState);
 
-        clientEventLog.append("\tRead Variables: ");
-        for (String readVariable : this.configurations.getReadVariables(currentState)) {
+        /* Adding Read Variables */
+        clientEventLog.append(" | Read Variables: ");
+        for (String readVariable : this.configurations.getReadVariables(fromState, event)) {
             clientEventLog.append(readVariable).append(" ");
         }
 
-        clientEventLog.append("\tWrite Variables: ");
-        for (String writeVariable : this.configurations.getWriteVariables(currentState)) {
+        /* Adding Write Variables */
+        clientEventLog.append("| Write Variables: ");
+        for (String writeVariable : this.configurations.getWriteVariables(fromState, event)) {
             clientEventLog.append(writeVariable).append(" ");
         }
 
@@ -312,17 +306,24 @@ public class Client {
      * Tries to allocate from server and execute its incoming event
      */
     private void allocateAndExecute(String event) throws InterruptedException, IOException {
-        boolean isAllocated = false;
         int turn = 0;
+        boolean firstAttempt = true; // First attempt (if any), will be logged
 
-        while (!isAllocated) {
+        /* Polling */
+        while (!this.sendAllocationRequest(event)) {
+            if (firstAttempt) {
+                this.recordEvent(event, "Attempt"); // Record the first attempt
+                firstAttempt = false;
+            }
             this.backoffPoll(turn);
             turn = turn + 1;
-            isAllocated = this.sendAllocationRequest(event);
         }
 
-        this.recordEvent();
+        /* Recording The Successful Allocation Request, Running The State Machine */
+        this.recordEvent(event, "Success");
         this.stateMachine.sendEvent(event);
+
+        /* Sending A Notification Message */
         this.sendNotificationMessage(this.stateMachine.getState().getId());
     }
 
@@ -337,7 +338,6 @@ public class Client {
             while (!inputQueue.isEmpty()) {
                 String event = inputQueue.poll();
                 this.allocateAndExecute(event);
-                Thread.sleep(500);
             }
         }
 

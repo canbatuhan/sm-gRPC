@@ -7,6 +7,7 @@ import com.cloudlab.grpc.Tpc.AllocationResponse;
 import com.cloudlab.grpc.Tpc.NotificationMessage;
 import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc.tpcImplBase;
+import com.google.protobuf.ProtocolStringList;
 import io.grpc.stub.StreamObserver;
 
 import java.util.HashMap;
@@ -15,15 +16,33 @@ import java.util.HashSet;
 
 public class TwoPhaseCommitServices extends tpcImplBase {
     private Integer timestamp; // Timestamp of the server
-    private HashMap<String, Boolean> variableMap; // Map to check the variable status (in-use, available)
+    private HashMap<String, Pair> variableTable; // Map to check the variable status (isReading, isWriting)
     private HashSet<String> clientMap; // Set to see which clients are connected to the server
+
+    /**
+     * Class for storing the status of a variable (is on-read or is on-write)
+     */
+    private static class Pair {
+        public boolean readStatus; // Flag for read operations on variable
+        public boolean writeStatus; // Flag for write operations on variable
+
+        /**
+         * Builds a Pair object with given parameters
+         * @param readStatus flag for read operations
+         * @param writeStatus flag for write operations
+         */
+        public Pair(boolean readStatus, boolean writeStatus) {
+            this.readStatus = readStatus;
+            this.writeStatus = writeStatus;
+        }
+    }
 
     /**
      * Builds TwoPhaseCommitServices object
      */
     public TwoPhaseCommitServices() {
         this.timestamp = 0;
-        this.variableMap = new HashMap<>();
+        this.variableTable = new HashMap<>();
         this.clientMap = new HashSet<>();
     }
 
@@ -47,46 +66,60 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         String readVariable;
         String writeVariable;
 
-        /* Checking readFrom variables */
+        /* Checking readFrom Variables */
         int numOfReadVariables = request.getReadFromCount();
+        System.out.println("numOfReadVariables: " + numOfReadVariables);
         for (int index=0; index<numOfReadVariables; index++) {
             readVariable = request.getReadFrom(index);
 
-            // if the server face with this variable for the first time, add it to map
-            if (!this.variableMap.containsKey(readVariable)) {
-                this.variableMap.put(readVariable, false);
+            // if the server face with this variable for the first time, add it to table
+            // also set it has no read and write operations on this variable
+            if (!this.variableTable.containsKey(readVariable)) {
+                this.variableTable.put(readVariable, new Pair(false, false));
             }
 
-            // if the variable is "in-use", then server can not allocate for this event
-            else if (this.variableMap.get(readVariable)){
+            // if the variable is being written, then server can not allocate read operation
+            else if (this.variableTable.get(readVariable).writeStatus){
                 response = false;
                 break;
             }
         }
 
-        /* Checking the writeTo variables */
+        /* Checking writeTo Variables */
         int numOfWriteVariables = request.getWriteToCount();
+        System.out.println("numOfWriteVariables: " + numOfWriteVariables);
         for (int index=0; index<numOfWriteVariables; index++) {
             writeVariable = request.getWriteTo(index);
+            Pair currentPair = this.variableTable.get(writeVariable);
 
-            // if the server face with this variable for the firs time, add it to map
-            if (!this.variableMap.containsKey(writeVariable)) {
-                this.variableMap.put(writeVariable, false);
+            // if the server face with this variable for the first time, add it to map
+            // set it has no read and write operations on this variable
+            if (!this.variableTable.containsKey(writeVariable)) {
+                this.variableTable.put(writeVariable, new Pair(false, false));
             }
 
-            // if the variable is "in-use", then server can not allocate for this event
-            else if (this.variableMap.get(writeVariable)){
+            // if the variable is being read or written, then server can not allocate write operation
+            else if (currentPair.readStatus || currentPair.writeStatus){
                 response = false;
                 break;
             }
         }
 
-
-        // if the server is going to allocate for the event, set the variables as "in-use"
+        /* Setting the Variable Flags */
         if (response) {
+
+            // Set read flag of variables if allocated
+            for (int index=0; index<numOfReadVariables; index++) {
+                readVariable = request.getReadFrom(index);
+                Pair currentPair = this.variableTable.get(readVariable);
+                this.variableTable.replace(readVariable, new Pair(true, currentPair.writeStatus));
+            }
+
+            // Set write flag of variables if allocated
             for (int index=0; index<numOfWriteVariables; index++) {
                 writeVariable = request.getWriteTo(index);
-                this.variableMap.replace(writeVariable, true);
+                Pair currentPair = this.variableTable.get(writeVariable);
+                this.variableTable.replace(writeVariable, new Pair(currentPair.readStatus, true));
             }
         }
 
@@ -139,10 +172,10 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         String clientID = request.getClientID();
         Integer timestamp = request.getTimestamp();
 
-        /* response logic of greeting service */
+        /* Response Logic Of Greeting Service */
         boolean response;
 
-        // if the client is already connected, ignore message
+        // if the client is already connected, ignore the request
         if (this.clientMap.contains(clientID)) {
             response = false;
         }
@@ -153,7 +186,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
             response = true;
         }
 
-        /* generating and sending the response */
+        /* Generating And Sending The Response */
         this.updateTimestamp(timestamp);
         ConnectionResponse connectionResponse = this.generateConnectionResponse(response);
         responseObserver.onNext(connectionResponse);
@@ -170,10 +203,10 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         String clientID = request.getClientID();
         Integer timestamp = request.getTimestamp();
 
-        /* response logic of allocation service */
+        /* Response Logic Of Allocation Service */
         boolean response = allocationResponseLogic(request);
 
-        /* generating and sending the response */
+        /* Generating And Sending The Response */
         this.updateTimestamp(timestamp);
         AllocationResponse allocationResponse = this.generateAllocationResponse(response);
         responseObserver.onNext(allocationResponse);
@@ -189,14 +222,26 @@ public class TwoPhaseCommitServices extends tpcImplBase {
     public void notifyingService(NotificationMessage request, StreamObserver<Empty> responseObserver) {
         String clientID = request.getClientID();
         Integer timestamp = request.getTimestamp();
+        Pair currentPair;
 
-        /* operations in notifying service */
+        /* Clearing readFrom flag */
+        String readVariable;
+        int numOfReadVariable = request.getReadFromCount();
+
+        for (int index=0; index<numOfReadVariable; index++) {
+            readVariable = request.getReadFrom(index);
+            currentPair = this.variableTable.get(readVariable);
+            this.variableTable.replace(readVariable, new Pair(false, currentPair.writeStatus));
+        }
+
+        /* Clearing writeTo flag */
         String writeVariable;
-
         int numOfWriteVariable = request.getWriteToCount();
+
         for (int index=0; index<numOfWriteVariable; index++) {
             writeVariable = request.getWriteTo(index);
-            this.variableMap.replace(writeVariable, false);
+            currentPair = this.variableTable.get(writeVariable);
+            this.variableTable.replace(writeVariable, new Pair(currentPair.readStatus, false));
         }
 
         /* generating and sending the response */

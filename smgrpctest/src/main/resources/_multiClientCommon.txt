@@ -1,9 +1,0 @@
-[x] 4	tkjytmwamc	INITIAL	Read Variables: A B 	Write Variables: C 
-[x] 7	tkjytmwamc	S1	Read Variables: A C 	Write Variables: B 
-[x] 10	tkjytmwamc	S2	Read Variables: C 	Write Variables: A 
-[x] 13	tkjytmwamc	S1	Read Variables: A C 	Write Variables: B 
-[x] 16	tkjytmwamc	S2	Read Variables: C 	Write Variables: A 
-[x] 19	tkjytmwamc	S1	Read Variables: A C 	Write Variables: B 
-[x] 22	tkjytmwamc	S2	Read Variables: C 	Write Variables: A 
-[x] 25	tkjytmwamc	S1	Read Variables: A C 	Write Variables: B 
-[x] 28	tkjytmwamc	S2	Read Variables: C 	Write Variables: A 
