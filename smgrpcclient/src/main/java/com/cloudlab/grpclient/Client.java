@@ -108,7 +108,6 @@ public class Client {
         this.outputPath = outputPath;
     }
 
-
     /**
      * Reads input from a file (for now)
      * @throws FileNotFoundException when there is a file error (can not opened)
@@ -167,8 +166,7 @@ public class Client {
         index = 0;
         for (String writeVariable : writeVariables) {
             allocationRequest
-                    .addWriteTo(writeVariable)
-                    .buildPartial();
+                    .addWriteTo(writeVariable);
             index += 1;
         }
 
@@ -191,8 +189,7 @@ public class Client {
         int index = 0;
         for (String readVariable : readVariables) {
             notificationMessage
-                    .addReadFrom(readVariable)
-                    .buildPartial();
+                    .addReadFrom(readVariable);
             index += 1;
         }
 
@@ -200,8 +197,7 @@ public class Client {
         index = 0;
         for (String writeVariable : writeVariables) {
             notificationMessage
-                    .addWriteTo(writeVariable)
-                    .buildPartial();
+                    .addWriteTo(writeVariable);
             index += 1;
         }
 
@@ -306,6 +302,7 @@ public class Client {
      * Tries to allocate from server and execute its incoming event
      */
     private void allocateAndExecute(String event) throws InterruptedException, IOException {
+        String previousState = this.stateMachine.getState().getId(); // State before allocation and transition
         int turn = 0;
         boolean firstAttempt = true; // First attempt (if any), will be logged
 
@@ -324,7 +321,7 @@ public class Client {
         this.stateMachine.sendEvent(event);
 
         /* Sending A Notification Message */
-        this.sendNotificationMessage(this.stateMachine.getState().getId());
+        this.sendNotificationMessage(previousState); // Notify that the job is done in previousState
     }
 
     /**

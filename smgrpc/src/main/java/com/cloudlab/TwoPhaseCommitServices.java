@@ -7,7 +7,6 @@ import com.cloudlab.grpc.Tpc.AllocationResponse;
 import com.cloudlab.grpc.Tpc.NotificationMessage;
 import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc.tpcImplBase;
-import com.google.protobuf.ProtocolStringList;
 import io.grpc.stub.StreamObserver;
 
 import java.util.HashMap;
@@ -68,7 +67,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
 
         /* Checking readFrom Variables */
         int numOfReadVariables = request.getReadFromCount();
-        System.out.println("numOfReadVariables: " + numOfReadVariables);
         for (int index=0; index<numOfReadVariables; index++) {
             readVariable = request.getReadFrom(index);
 
@@ -87,7 +85,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
 
         /* Checking writeTo Variables */
         int numOfWriteVariables = request.getWriteToCount();
-        System.out.println("numOfWriteVariables: " + numOfWriteVariables);
         for (int index=0; index<numOfWriteVariables; index++) {
             writeVariable = request.getWriteTo(index);
             Pair currentPair = this.variableTable.get(writeVariable);

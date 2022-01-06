@@ -13,6 +13,10 @@ states:
     writeVariables: []
 
   - name: "S2"
+    readVariables: ["V1"]
+    writeVariables: []
+
+  - name: "S3"
     readVariables: []
     writeVariables: ["V2"]
 
@@ -30,10 +34,18 @@ transitions:
     fromState: "S1"
     toState: "S2"
 
+  - event: "E13"
+    fromState: "S1"
+    toState: "S3"
+
   - event: "E21"
     fromState: "S2"
     toState: "S1"
 
-  - event: "E2F"
-    fromState: "S2"
+  - event: "E31"
+    fromState: "S3"
+    toState: "S1"
+
+  - event: "E1F"
+    fromState: "S1"
     toState: "END"
