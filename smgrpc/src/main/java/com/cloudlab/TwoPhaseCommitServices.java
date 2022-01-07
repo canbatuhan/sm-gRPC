@@ -102,7 +102,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
             }
         }
 
-        /* Setting the Variable Flags */
+        /* Setting the Variable Flags If Allocated */
         if (response) {
 
             // Set read flag of variables if allocated
@@ -241,7 +241,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
             this.variableTable.replace(writeVariable, new Pair(currentPair.readStatus, false));
         }
 
-        /* generating and sending the response */
+        /* Generating And Sending The Response */
         this.updateTimestamp(timestamp);
         Empty empty = this.generateEmpty();
         responseObserver.onNext(empty);

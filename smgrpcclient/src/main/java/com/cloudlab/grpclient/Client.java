@@ -302,7 +302,6 @@ public class Client {
      * Tries to allocate from server and execute its incoming event
      */
     private void allocateAndExecute(String event) throws InterruptedException, IOException {
-        String previousState = this.stateMachine.getState().getId(); // State before allocation and transition
         int turn = 0;
         boolean firstAttempt = true; // First attempt (if any), will be logged
 
@@ -321,7 +320,7 @@ public class Client {
         this.stateMachine.sendEvent(event);
 
         /* Sending A Notification Message */
-        this.sendNotificationMessage(previousState); // Notify that the job is done in previousState
+        this.sendNotificationMessage(this.stateMachine.getState().getId());
     }
 
     /**

@@ -14,7 +14,7 @@ states:
 
   - name: "S2"
     readVariables: []
-    writeVariables: ["V2"]
+    writeVariables: ["V1"]
 
   - name: "END"
     readVariables: []
