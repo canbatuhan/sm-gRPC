@@ -9,16 +9,16 @@ states:
     writeVariables: []
 
   - name: "S1"
-    readVariables: ["V1"]
-    writeVariables: []
+    readVariables: ["V1", "V2"]
+    writeVariables: ["V3"]
 
   - name: "S2"
-    readVariables: ["V1"]
+    readVariables: ["V1", "V3"]
     writeVariables: ["V2"]
 
   - name: "S3"
-    readVariables: ["V2"]
-    writeVariables: ["V1"]
+    readVariables: ["V3"]
+    writeVariables: ["V1", "V2"]
 
   - name: "END"
     readVariables: []

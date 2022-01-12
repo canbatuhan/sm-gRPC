@@ -10,7 +10,7 @@ states:
 
   - name: "CENTER"
     readVariables: []
-    writeVariables: []
+    writeVariables: ["V1", "V2"]
 
   - name: "RR"
     readVariables: ["V1", "V2"]
