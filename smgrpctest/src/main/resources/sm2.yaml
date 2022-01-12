@@ -14,11 +14,11 @@ states:
 
   - name: "S2"
     readVariables: ["V1"]
-    writeVariables: []
+    writeVariables: ["V2"]
 
   - name: "S3"
-    readVariables: []
-    writeVariables: ["V2"]
+    readVariables: ["V2"]
+    writeVariables: ["V1"]
 
   - name: "END"
     readVariables: []

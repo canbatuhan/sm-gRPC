@@ -204,13 +204,13 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         Integer timestamp = request.getTimestamp();
         Pair currentPair;
 
-        /* Clearing readFrom Flags */
+        /* Decrementing The Number Of Read Operations */
         for (String readVariable : request.getReadFromList()) {
             currentPair = this.variableTable.get(readVariable);
             this.variableTable.replace(readVariable, new Pair(currentPair.getNumOfRead()-1, currentPair.getNumOfWrite()));
         }
 
-        /* Clearing writeTo Flags */
+        /* Decrementing The Number Of Read Operations */
         for (String writeVariable : request.getWriteToList()) {
             currentPair = this.variableTable.get(writeVariable);
             this.variableTable.replace(writeVariable, new Pair(currentPair.getNumOfRead(), currentPair.getNumOfWrite()-1));

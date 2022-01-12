@@ -38,8 +38,6 @@ transitions:
     fromState: "INITIAL"
     toState: "CENTER"
 
-  # From CENTER to Ops
-
   - event: "R1R2"
     fromState: "CENTER"
     toState: "RR"
@@ -56,8 +54,6 @@ transitions:
     fromState: "CENTER"
     toState: "WW"
 
-  # From Ops to CENTER
-
   - event: "BACK"
     fromState: "RR"
     toState: "CENTER"
@@ -73,3 +69,7 @@ transitions:
   - event: "BACK"
     fromState: "WW"
     toState: "CENTER"
+
+  - event: "FIN"
+    fromState: "CENTER"
+    toState: "END"

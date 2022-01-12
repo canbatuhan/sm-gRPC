@@ -23,10 +23,12 @@ public class Pair {
     }
 
     public boolean isRead() {
+        if (this.numOfRead < 0) this.numOfRead = 0;
         return this.numOfRead != 0;
     }
 
     public boolean isWrite() {
+        if (this.numOfWrite < 0) this.numOfWrite = 0;
         return this.numOfWrite != 0;
     }
 }
