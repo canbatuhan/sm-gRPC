@@ -1,6 +1,5 @@
 package com.cloudlab.grpclient;
 
-import com.cloudlab.grpc.Tpc;
 import com.cloudlab.grpc.Tpc.ConnectionRequest;
 import com.cloudlab.grpc.Tpc.ConnectionResponse;
 import com.cloudlab.grpc.Tpc.AllocationRequest;
@@ -10,7 +9,6 @@ import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc;
 import com.cloudlab.statemachine.StateMachineGenerator;
 import com.cloudlab.yamlprocessor.Configurations;
-import com.cloudlab.yamlprocessor.Transition;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.grpc.ManagedChannel;
@@ -22,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
+
 
 public class Client {
 
@@ -157,16 +156,14 @@ public class Client {
         /* Adding readFrom Variables To Request */
         int index = 0;
         for (String readVariable : readVariables) {
-            allocationRequest
-                    .addReadFrom(readVariable);
+            allocationRequest.addReadFrom(readVariable);
             index += 1;
         }
 
         /* Adding writeTo Variables To Request */
         index = 0;
         for (String writeVariable : writeVariables) {
-            allocationRequest
-                    .addWriteTo(writeVariable);
+            allocationRequest.addWriteTo(writeVariable);
             index += 1;
         }
 
@@ -188,16 +185,14 @@ public class Client {
         /* Adding readFrom Variables To Message */
         int index = 0;
         for (String readVariable : readVariables) {
-            notificationMessage
-                    .addReadFrom(readVariable);
+            notificationMessage.addReadFrom(readVariable);
             index += 1;
         }
 
         /* Adding writeTo Variables To Message */
         index = 0;
         for (String writeVariable : writeVariables) {
-            notificationMessage
-                    .addWriteTo(writeVariable);
+            notificationMessage.addWriteTo(writeVariable);
             index += 1;
         }
 
@@ -265,7 +260,9 @@ public class Client {
     }
 
     /**
-     * Builds string for logging of reading and writing actions
+     * Records a request if it is successful or in first attempt
+     * @param event event that triggers the state machine
+     * @param successOrAttempt success or attempt message
      */
     private void recordEvent(String event, String successOrAttempt) throws IOException {
         FileWriter fileWriter = new FileWriter(this.outputPath, true);
@@ -299,9 +296,10 @@ public class Client {
     }
 
     /**
-     * Tries to allocate from server and execute its incoming event
+     * Tries to allocate from server, executes the task and notifies
+     * @param event event that will trigger the state machine
      */
-    private void allocateAndExecute(String event) throws InterruptedException, IOException {
+    private void allocateExecuteNotify(String event) throws InterruptedException, IOException {
         int turn = 0;
         boolean firstAttempt = true; // First attempt (if any), will be logged
 
@@ -333,7 +331,7 @@ public class Client {
         if (this.sendConnectionRequest()) {
             while (!inputQueue.isEmpty()) {
                 String event = inputQueue.poll();
-                this.allocateAndExecute(event);
+                this.allocateExecuteNotify(event);
             }
         }
 
