@@ -12,11 +12,18 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicStampedReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class TwoPhaseCommitServices extends tpcImplBase {
+    private static Object mon = new Object();
+    private static AtomicBoolean allocating = new AtomicBoolean(false);
+    private ReentrantLock reentrantLock = new ReentrantLock();
     private Integer timestamp; // Timestamp of the server
-    private HashMap<String, Pair> variableTable; // Map to check the variable status (isReading, isWriting)
+    private enum writeStatus {WRITING, NOT_WRITING};
+    private HashMap<String, AtomicStampedReference<writeStatus>> variableTable; // Map to check the variable status (isReading, isWriting)
     private HashSet<String> clientMap; // Set to see which clients are connected to the server
 
     /**
@@ -53,53 +60,46 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         for (int index=0; index<numOfReadVariables; index++) {
             readVariable = request.getReadFrom(index);
 
-            // If the server face with this variable for the first time, add it to table
+            // If the server face with this variable for the first time, add it to the table
             // Also set it has no read and write operations on this variable
+            this.reentrantLock.lock();
             if (!this.variableTable.containsKey(readVariable)) {
-                this.variableTable.put(readVariable, new Pair(0, 0));
+                this.variableTable.put(readVariable, new AtomicStampedReference<>(writeStatus.NOT_WRITING, 1));
+                this.reentrantLock.unlock();
+                break;
             }
+            this.reentrantLock.unlock();
 
             // If the variable is being written, then server can not allocate read operation
-            else if (this.variableTable.get(readVariable).isWrite()){
+            int numOfReaders = this.variableTable.get(readVariable).getStamp();
+            if (!this.variableTable.get(readVariable).compareAndSet(writeStatus.NOT_WRITING, writeStatus.NOT_WRITING, numOfReaders, numOfReaders+1)) {
                 response = false;
                 break;
             }
+
+            int a = this.variableTable.get(readVariable).getStamp();
+            if (a < 0 || a > 1) System.out.println("\n\n\n\n\n_________BUSTED!________\n\n\n\n\n");
         }
 
         /* Checking writeTo Variables */
         int numOfWriteVariables = request.getWriteToCount();
         for (int index=0; index<numOfWriteVariables; index++) {
             writeVariable = request.getWriteTo(index);
-            Pair currentPair = this.variableTable.get(writeVariable);
 
-            // If the server face with this variable for the first time, add it to map
-            // Set it has no read and write operations on this variable
+            // If the server face with this variable for the first time, add it to the table
+            // Also set it has no read and write operations on this variable
+            this.reentrantLock.lock();
             if (!this.variableTable.containsKey(writeVariable)) {
-                this.variableTable.put(writeVariable, new Pair(0, 0));
-            }
-
-            // If the variable is being read or written, then server can not allocate write operation
-            else if (currentPair.isRead() || currentPair.isWrite()){
-                response = false;
+                this.variableTable.put(writeVariable, new AtomicStampedReference<>(writeStatus.WRITING, 0));
+                this.reentrantLock.unlock();
                 break;
             }
-        }
+            this.reentrantLock.unlock();
 
-        /* Setting The Variable Flags If Allocated */
-        if (response) {
-
-            // Update number of reading variables, if allocated
-            for (int index=0; index<numOfReadVariables; index++) {
-                readVariable = request.getReadFrom(index);
-                Pair currentPair = this.variableTable.get(readVariable);
-                this.variableTable.replace(readVariable, new Pair(currentPair.getNumOfRead()+1, currentPair.getNumOfWrite()));
-            }
-
-            // Update the number of writing variables, if allocated
-            for (int index=0; index<numOfWriteVariables; index++) {
-                writeVariable = request.getWriteTo(index);
-                Pair currentPair = this.variableTable.get(writeVariable);
-                this.variableTable.replace(writeVariable, new Pair(currentPair.getNumOfRead(), currentPair.getNumOfWrite()+1));
+            // If the variable is being read or written, then server can not allocate write operation
+            if (!this.variableTable.get(writeVariable).compareAndSet(writeStatus.NOT_WRITING, writeStatus.WRITING, 0, 0)) {
+                response = false;
+                break;
             }
         }
 
@@ -184,7 +184,25 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         Integer timestamp = request.getTimestamp();
 
         /* Response Logic Of Allocation Service */
-        boolean response = allocationResponseLogic(request);
+        boolean response;
+
+        /* synchronized (TwoPhaseCommitServices.mon) {
+            try {
+
+                while (!TwoPhaseCommitServices.allocating.compareAndSet(false, true)) {
+                    TwoPhaseCommitServices.mon.wait();
+                }
+
+                response = allocationResponseLogic(request);
+                TwoPhaseCommitServices.allocating.set(false);
+                TwoPhaseCommitServices.mon.notifyAll();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+         */
+
+        response = allocationResponseLogic(request);
 
         /* Generating And Sending The Response */
         this.updateTimestamp(timestamp);
@@ -206,14 +224,17 @@ public class TwoPhaseCommitServices extends tpcImplBase {
 
         /* Decrementing The Number Of Read Operations */
         for (String readVariable : request.getReadFromList()) {
-            currentPair = this.variableTable.get(readVariable);
-            this.variableTable.replace(readVariable, new Pair(currentPair.getNumOfRead()-1, currentPair.getNumOfWrite()));
+            int numOfReaders = this.variableTable.get(readVariable).getStamp();
+            while (!this.variableTable.get(readVariable).compareAndSet(writeStatus.NOT_WRITING, writeStatus.NOT_WRITING, numOfReaders, numOfReaders-1)) {
+                numOfReaders = this.variableTable.get(readVariable).getStamp();
+            }
         }
 
         /* Decrementing The Number Of Read Operations */
         for (String writeVariable : request.getWriteToList()) {
-            currentPair = this.variableTable.get(writeVariable);
-            this.variableTable.replace(writeVariable, new Pair(currentPair.getNumOfRead(), currentPair.getNumOfWrite()-1));
+            if (!this.variableTable.get(writeVariable).compareAndSet(writeStatus.WRITING, writeStatus.NOT_WRITING, 0, 0)) {
+                System.out.println("TWO WRITERS AT THE SAME TIME");
+            }
         }
 
         /* Generating And Sending The Response */

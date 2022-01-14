@@ -1,27 +1,30 @@
 package com.cloudlab.structs;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class Pair {
-    private int numOfRead; // Number of read operations on variable
-    private int numOfWrite; // Number of write operations on variable
+    private AtomicInteger numOfRead; // Number of read operations on variable
+    private AtomicInteger numOfWrite; // Number of write operations on variable
 
     /**
      * Builds a Pair object with given parameters
      * @param numOfRead number of read operations
      * @param numOfWrite number of write operations
      */
-    public Pair(int numOfRead, int numOfWrite) {
+    public Pair(AtomicInteger numOfRead, AtomicInteger numOfWrite) {
         this.numOfRead = numOfRead;
         this.numOfWrite = numOfWrite;
     }
 
-    public int getNumOfRead() {
+    public AtomicInteger getNumOfRead() {
         return numOfRead;
     }
 
-    public int getNumOfWrite() {
+    public AtomicInteger getNumOfWrite() {
         return numOfWrite;
     }
 
+    /*
     public boolean isRead() {
         if (this.numOfRead < 0) this.numOfRead = 0;
         return this.numOfRead != 0;
@@ -31,4 +34,5 @@ public class Pair {
         if (this.numOfWrite < 0) this.numOfWrite = 0;
         return this.numOfWrite != 0;
     }
+    */
 }

@@ -16,6 +16,8 @@ import io.grpc.ManagedChannelBuilder;
 import org.springframework.statemachine.StateMachine;
 
 import java.io.*;
+import java.sql.Time;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -154,17 +156,13 @@ public class Client {
                 .setTimestamp(this.timestamp);
 
         /* Adding readFrom Variables To Request */
-        int index = 0;
         for (String readVariable : readVariables) {
             allocationRequest.addReadFrom(readVariable);
-            index += 1;
         }
 
         /* Adding writeTo Variables To Request */
-        index = 0;
         for (String writeVariable : writeVariables) {
             allocationRequest.addWriteTo(writeVariable);
-            index += 1;
         }
 
         return allocationRequest.build();
@@ -183,17 +181,13 @@ public class Client {
                 .setTimestamp(this.timestamp);
 
         /* Adding readFrom Variables To Message */
-        int index = 0;
         for (String readVariable : readVariables) {
             notificationMessage.addReadFrom(readVariable);
-            index += 1;
         }
 
         /* Adding writeTo Variables To Message */
-        index = 0;
         for (String writeVariable : writeVariables) {
             notificationMessage.addWriteTo(writeVariable);
-            index += 1;
         }
 
         return notificationMessage.build();
@@ -273,19 +267,21 @@ public class Client {
         StringBuilder clientEventLog = new StringBuilder();
         clientEventLog
                 .append("[x] ")
-                .append(this.timestamp).append(" | ")
-                .append(this.clientID).append(" | ")
-                .append(successOrAttempt).append(" | ")
-                .append(toState);
+                .append(this.timestamp).append("\t|\t")
+                .append(this.clientID).append("\t|\t")
+                .append(successOrAttempt).append("\t|\t")
+                .append(toState).append("\t|\t");
 
         /* Adding Read Variables */
-        clientEventLog.append(" | Read Variables: ");
+        clientEventLog.append("Read Variables: ");
         for (String readVariable : this.configurations.getReadVariables(fromState, event)) {
             clientEventLog.append(readVariable).append(" ");
         }
 
+        clientEventLog.append("\t|\t");
+
         /* Adding Write Variables */
-        clientEventLog.append("| Write Variables: ");
+        clientEventLog.append("Write Variables: ");
         for (String writeVariable : this.configurations.getWriteVariables(fromState, event)) {
             clientEventLog.append(writeVariable).append(" ");
         }
@@ -319,6 +315,7 @@ public class Client {
 
         /* Sending A Notification Message */
         this.sendNotificationMessage(this.stateMachine.getState().getId());
+        System.out.println("\n\n\n" + this.clientID + " Released____\n\n\n");
     }
 
     /**
