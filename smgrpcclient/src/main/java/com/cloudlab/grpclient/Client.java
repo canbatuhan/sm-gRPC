@@ -314,13 +314,8 @@ public class Client {
         this.stateMachine.sendEvent(event);
 
         /* Sending A Notification Message */
-        try {
-            this.sendNotificationMessage(this.stateMachine.getState().getId());
-            System.out.println("\n\n\n" + this.clientID + " Released____\n\n\n");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.sendNotificationMessage(this.stateMachine.getState().getId());
+        System.out.println("\n\n\n" + this.clientID + " Released____\n\n\n");
     }
 
     /**

@@ -1,0 +1,75 @@
+# Configurations
+machineID: "grpcStateMachine"
+autoStartup: false
+
+# States
+states:
+  - name: "INITIAL"
+    readVariables: []
+    writeVariables: []
+
+  - name: "CENTER"
+    readVariables: []
+    writeVariables: ["V1", "V2"]
+
+  - name: "RR"
+    readVariables: ["V1", "V2"]
+    writeVariables: []
+
+  - name: "RW"
+    readVariables: ["V1"]
+    writeVariables: ["V2"]
+
+  - name: "WR"
+    readVariables: ["V2"]
+    writeVariables: ["V1"]
+
+  - name: "WW"
+    readVariables: []
+    writeVariables: ["V1", "V2"]
+
+  - name: "END"
+    readVariables: []
+    writeVariables: []
+
+# Transitions & Events
+transitions:
+  - event: "GO"
+    fromState: "INITIAL"
+    toState: "CENTER"
+
+  - event: "R1R2"
+    fromState: "CENTER"
+    toState: "RR"
+
+  - event: "R1W2"
+    fromState: "CENTER"
+    toState: "RW"
+
+  - event: "W1R2"
+    fromState: "CENTER"
+    toState: "WR"
+
+  - event: "W1W2"
+    fromState: "CENTER"
+    toState: "WW"
+
+  - event: "BACK"
+    fromState: "RR"
+    toState: "CENTER"
+
+  - event: "BACK"
+    fromState: "RW"
+    toState: "CENTER"
+
+  - event: "BACK"
+    fromState: "WR"
+    toState: "CENTER"
+
+  - event: "BACK"
+    fromState: "WW"
+    toState: "CENTER"
+
+  - event: "FIN"
+    fromState: "CENTER"
+    toState: "END"

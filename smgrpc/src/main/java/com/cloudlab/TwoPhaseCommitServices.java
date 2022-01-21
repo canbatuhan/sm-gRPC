@@ -7,24 +7,20 @@ import com.cloudlab.grpc.Tpc.AllocationResponse;
 import com.cloudlab.grpc.Tpc.NotificationMessage;
 import com.cloudlab.grpc.Tpc.Empty;
 import com.cloudlab.grpc.tpcGrpc.tpcImplBase;
-import com.cloudlab.structs.Pair;
 import io.grpc.stub.StreamObserver;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicStampedReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 
 public class TwoPhaseCommitServices extends tpcImplBase {
-    private static Object mon = new Object();
-    private static AtomicBoolean allocating = new AtomicBoolean(false);
-    private static ReentrantLock reentrantLock = new ReentrantLock();
+    private static final ReentrantLock reentrantLock = new ReentrantLock();
     private Integer timestamp; // Timestamp of the server
     private enum writeStatus {WRITING, NOT_WRITING};
-    private HashMap<String, AtomicStampedReference<writeStatus>> variableTable; // Map to check the variable status (isReading, isWriting)
-    private HashSet<String> clientMap; // Set to see which clients are connected to the server
+    private final HashMap<String, AtomicStampedReference<writeStatus>> variableTable; // Map to check the variable status (isReading, isWriting)
+    private final HashSet<String> clientMap; // Set to see which clients are connected to the server
 
     /**
      * Builds TwoPhaseCommitServices object
@@ -61,7 +57,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
             readVariable = request.getReadFrom(index);
 
             // If the server face with this variable for the first time, add it to the table
-            // Also set it has no read and write operations on this variable
             TwoPhaseCommitServices.reentrantLock.lock();
             if (!this.variableTable.containsKey(readVariable)) {
                 this.variableTable.put(readVariable, new AtomicStampedReference<>(writeStatus.NOT_WRITING, 1));
@@ -74,11 +69,9 @@ public class TwoPhaseCommitServices extends tpcImplBase {
             int numOfReaders = this.variableTable.get(readVariable).getStamp();
             if (!this.variableTable.get(readVariable).compareAndSet(writeStatus.NOT_WRITING, writeStatus.NOT_WRITING, numOfReaders, numOfReaders+1)) {
                 response = false;
-                continue;
+                break;
             }
 
-            int a = this.variableTable.get(readVariable).getStamp();
-            if (a < 0 || a > 1) System.out.println("\n\n\n\n\n_________BUSTED!________\n\n\n\n\n");
         }
 
         /* Checking writeTo Variables */
@@ -87,7 +80,6 @@ public class TwoPhaseCommitServices extends tpcImplBase {
             writeVariable = request.getWriteTo(index);
 
             // If the server face with this variable for the first time, add it to the table
-            // Also set it has no read and write operations on this variable
             TwoPhaseCommitServices.reentrantLock.lock();
             if (!this.variableTable.containsKey(writeVariable)) {
                 this.variableTable.put(writeVariable, new AtomicStampedReference<>(writeStatus.WRITING, 0));
@@ -99,7 +91,7 @@ public class TwoPhaseCommitServices extends tpcImplBase {
             // If the variable is being read or written, then server can not allocate write operation
             if (!this.variableTable.get(writeVariable).compareAndSet(writeStatus.NOT_WRITING, writeStatus.WRITING, 0, 0)) {
                 response = false;
-                continue;
+                break;
             }
         }
 
@@ -183,39 +175,14 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         String clientID = request.getClientID();
         Integer timestamp = request.getTimestamp();
 
-        try {
-            /* Response Logic Of Allocation Service */
-            boolean response;
+        /* Response Logic Of Allocation Service */
+        boolean response = allocationResponseLogic(request);
 
-            /* synchronized (TwoPhaseCommitServices.mon) {
-                try {
-
-                    while (!TwoPhaseCommitServices.allocating.compareAndSet(false, true)) {
-                        TwoPhaseCommitServices.mon.wait();
-                    }
-
-                    response = allocationResponseLogic(request);
-                    TwoPhaseCommitServices.allocating.set(false);
-                    TwoPhaseCommitServices.mon.notifyAll();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-             */
-
-            response = allocationResponseLogic(request);
-
-            /* Generating And Sending The Response */
-            this.updateTimestamp(timestamp);
-            AllocationResponse allocationResponse = this.generateAllocationResponse(response);
-            responseObserver.onNext(allocationResponse);
-            responseObserver.onCompleted();
-        }
-
-        catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        /* Generating And Sending The Response */
+        this.updateTimestamp(timestamp);
+        AllocationResponse allocationResponse = this.generateAllocationResponse(response);
+        responseObserver.onNext(allocationResponse);
+        responseObserver.onCompleted();
     }
 
     /**
@@ -228,32 +195,25 @@ public class TwoPhaseCommitServices extends tpcImplBase {
         String clientID = request.getClientID();
         Integer timestamp = request.getTimestamp();
 
-        try {
-            /* Decrementing The Number Of Read Operations */
-            for (String readVariable : request.getReadFromList()) {
-                int numOfReaders = this.variableTable.get(readVariable).getStamp();
-                while (!this.variableTable.get(readVariable).compareAndSet(writeStatus.NOT_WRITING, writeStatus.NOT_WRITING, numOfReaders, numOfReaders - 1)) {
-                    numOfReaders = this.variableTable.get(readVariable).getStamp();
-                }
+        /* Decrementing The Number Of Read Operations */
+        for (String readVariable : request.getReadFromList()) {
+            int numOfReaders = this.variableTable.get(readVariable).getStamp();
+            while (!this.variableTable.get(readVariable).compareAndSet(writeStatus.NOT_WRITING, writeStatus.NOT_WRITING, numOfReaders, numOfReaders - 1)) {
+                numOfReaders = this.variableTable.get(readVariable).getStamp();
             }
-
-            /* Decrementing The Number Of Read Operations */
-            for (String writeVariable : request.getWriteToList()) {
-                if (!this.variableTable.get(writeVariable).compareAndSet(writeStatus.WRITING, writeStatus.NOT_WRITING, 0, 0)) {
-                    System.out.println("TWO WRITERS AT THE SAME TIME");
-                }
-            }
-
-            /* Generating And Sending The Response */
-            this.updateTimestamp(timestamp);
-            Empty empty = this.generateEmpty();
-            responseObserver.onNext(empty);
-            responseObserver.onCompleted();
         }
 
-        catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+        /* Clearing The Flag For Write Operation */
+        for (String writeVariable : request.getWriteToList()) {
+            if (!this.variableTable.get(writeVariable).compareAndSet(writeStatus.WRITING, writeStatus.NOT_WRITING, 0, 0)) {
+                System.out.println("TWO WRITERS AT THE SAME TIME");
+            }
         }
+
+        /* Generating And Sending The Response */
+        this.updateTimestamp(timestamp);
+        Empty empty = this.generateEmpty();
+        responseObserver.onNext(empty);
+        responseObserver.onCompleted();
     }
 }
